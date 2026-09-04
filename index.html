@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EGE - Arrows Puzzle</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: white;
+    color: #111;
+    font-family: Arial, sans-serif;
+}
+
+button {
+    font-family: Arial, sans-serif;
+}
+
+.screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* =========================
+   ANA MENÜ
+========================= */
+
+#menu {
+    justify-content: center;
+    text-align: center;
+}
+
+.menu-title {
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    margin-bottom: 5px;
+}
+
+.menu-subtitle {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 45px;
+}
+
+.menu-button {
+    width: 230px;
+    padding: 17px;
+    margin: 8px;
+    border: 3px solid #111;
+    border-radius: 12px;
+    background: #111;
+    color: white;
+    font-size: 21px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.menu-button:hover {
+    transform: scale(1.05);
+}
+
+.menu-button.secondary {
+    background: white;
+    color: #111;
+}
+
+/* =========================
+   OYUN
+========================= */
+
+#game {
+    display: none;
+}
+
+#title {
+    margin-top: 25px;
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 5px;
+}
+
+#info {
+    width: min(90vw, 520px);
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+#lives {
+    letter-spacing: 2px;
+}
+
+#board {
+    margin-top: 35px;
+    width: min(88vw, 520px);
+    aspect-ratio: 1;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 3px;
+    padding: 4px;
+    background: #111;
+    border: 4px solid #111;
+}
+
+.cell {
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.arrow {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: clamp(30px, 7vw, 55px);
+    font-weight: 900;
+    cursor: pointer;
+    user-select: none;
+    transition:
+        transform .35s ease,
+        opacity .35s ease;
+}
+
+.arrow:hover {
+    transform: scale(1.08);
+}
+
+#message {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.game-button {
+    display: none;
+    margin-top: 15px;
+    padding: 12px 25px;
+    border: 2px solid #111;
+    border-radius: 10px;
+    background: #111;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#menuButton {
+    display: block;
+    background: white;
+    color: #111;
+}
+
+@media (max-width: 500px) {
+
+    .menu-title {
+        font-size: 50px;
+    }
+
+    #board {
+        margin-top: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     ANA MENÜ
+========================= -->
+
+<div id="menu" class="screen">
+
+    <div class="menu-title">
+        EGE
+    </div>
+
+    <div class="menu-subtitle">
+        ARROWS PUZZLE ESCAPE
+    </div>
+
+    <button class="menu-button" id="startButton">
+        ▶ BAŞLA
+    </button>
+
+    <button class="menu-button secondary" id="howButton">
+        ? NASIL OYNANIR
+    </button>
+
+</div>
+
+
+<!-- =========================
+     OYUN EKRANI
+========================= -->
+
+<div id="game" class="screen">
+
+    <div id="title">
+        EGE
+    </div>
+
+    <div id="info">
+
+        <span>
+            LEVEL <span id="level">1</span>
+        </span>
+
+        <span id="lives">
+            ❤️ ❤️ ❤️
+        </span>
+
+    </div>
+
+    <div id="board"></div>
+
+    <div id="message">
+        Okları dışarı çıkar!
+    </div>
+
+    <button id="next" class="game-button">
+        SONRAKİ LEVEL ➜
+    </button>
+
+    <button id="menuButton" class="game-button">
+        MENÜYE DÖN
+    </button>
+
+</div>
+
+
+<script>
+
+/* =========================
+   OYUN AYARLARI
+========================= */
+
+const SIZE = 6;
+
+let level = 1;
+let lives = 3;
+let arrows = [];
+
+
+/* =========================
+   YÖNLER
+========================= */
+
+const directions = {
+
+    up: {
+        symbol: "↑",
+        dr: -1,
+        dc: 0
+    },
+
+    down: {
+        symbol: "↓",
+        dr: 1,
+        dc: 0
+    },
+
+    left: {
+        symbol: "←",
+        dr: 0,
+        dc: -1
+    },
+
+    right: {
+        symbol: "→",
+        dr: 0,
+        dc: 1
+    }
+
+};
+
+
+/* =========================
+   LEVEL TASARIMLARI
+========================= */
+
+const levels = [
+
+    [
+        {r:2,c:2,d:"right"},
+        {r:2,c:3,d:"right"},
+        {r:3,c:1,d:"up"},
+        {r:3,c:3,d:"down"},
+        {r:4,c:3,d:"left"},
+        {r:4,c:4,d:"up"}
+    ],
+
+    [
+        {r:1,c:1,d:"right"},
+        {r:1,c:2,d:"right"},
+        {r:1,c:4,d:"down"},
+        {r:2,c:4,d:"down"},
+        {r:3,c:2,d:"left"},
+        {r:3,c:3,d:"left"},
+        {r:4,c:2,d:"up"},
+        {r:4,c:4,d:"up"}
+    ],
+
+    [
+        {r:1,c:1,d:"down"},
+        {r:2,c:1,d:"right"},
+        {r:2,c:2,d:"right"},
+        {r:2,c:4,d:"down"},
+        {r:3,c:4,d:"left"},
+        {r:3,c:3,d:"left"},
+        {r:4,c:2,d:"up"},
+        {r:5,c:2,d:"up"},
+        {r:4,c:5,d:"left"}
+    ],
+
+    [
+        {r:1,c:1,d:"right"},
+        {r:1,c:2,d:"down"},
+        {r:2,c:2,d:"right"},
+        {r:2,c:3,d:"down"},
+        {r:3,c:3,d:"left"},
+        {r:3,c:2,d:"down"},
+        {r:4,c:2,d:"right"},
+        {r:4,c:3,d:"right"},
+        {r:4,c:4,d:"up"},
+        {r:5,c:4,d:"up"}
+    ],
+
+    [
+        {r:0,c:1,d:"down"},
+        {r:1,c:1,d:"right"},
+        {r:1,c:2,d:"down"},
+        {r:2,c:2,d:"right"},
+        {r:2,c:3,d:"down"},
+        {r:3,c:3,d:"left"},
+        {r:3,c:2,d:"down"},
+        {r:4,c:2,d:"right"},
+        {r:4,c:3,d:"right"},
+        {r:4,c:4,d:"up"},
+        {r:5,c:4,d:"left"},
+        {r:5,c:3,d:"up"}
+    ]
+
+];
+
+
+/* =========================
+   EKRANLAR
+========================= */
+
+const menu = document.getElementById("menu");
+const game = document.getElementById("game");
+
+document.getElementById("startButton")
+.addEventListener("click", function() {
+
+    menu.style.display = "none";
+    game.style.display = "flex";
+
+    level = 1;
+    lives = 3;
+
+    updateLives();
+    createLevel();
+
+});
+
+
+document.getElementById("howButton")
+.addEventListener("click", function() {
+
+    alert(
+        "🎮 NASIL OYNANIR?\n\n" +
+        "Okların üzerine bas.\n" +
+        "Önü açıksa ok dışarı çıkar.\n" +
+        "Önünde başka ok varsa çıkamaz.\n" +
+        "3 canın var.\n" +
+        "Bütün okları çıkar ve leveli tamamla!"
+    );
+
+});
+
+
+/* =========================
+   CAN
+========================= */
+
+function updateLives() {
+
+    const element =
+        document.getElementById("lives");
+
+    element.textContent =
+        "❤️ ".repeat(lives).trim();
+
+}
+
+
+/* =========================
+   LEVEL OLUŞTUR
+========================= */
+
+function createLevel() {
+
+    const board =
+        document.getElementById("board");
+
+    board.innerHTML = "";
+
+    arrows = [];
+
+
+    for(let i = 0; i < SIZE * SIZE; i++) {
+
+        const cell =
+            document.createElement("div");
+
+        cell.className = "cell";
+        cell.dataset.index = i;
+
+        board.appendChild(cell);
+
+    }
+
+
+    const data =
+        levels[(level - 1) % levels.length];
+
+
+    data.forEach(function(item, index) {
+
+        const cellIndex =
+            item.r * SIZE + item.c;
+
+        const cell =
+            board.children[cellIndex];
+
+
+        const arrow =
+            document.createElement("div");
+
+        arrow.className = "arrow";
+
+        arrow.textContent =
+            directions[item.d].symbol;
+
+
+        const object = {
+
+            id: index,
+            index: cellIndex,
+            direction: item.d,
+            element: arrow,
+            removed: false
+
+        };
+
+
+        arrows.push(object);
+
+        cell.appendChild(arrow);
+
+
+        arrow.addEventListener("click", function() {
+
+            moveArrow(object);
+
+        });
+
+    });
+
+
+    document.getElementById("level")
+        .textContent = level;
+
+    document.getElementById("message")
+        .textContent = "Okları dışarı çıkar!";
+
+    document.getElementById("next")
+        .style.display = "none";
+
+    document.getElementById("menuButton")
+        .style.display = "block";
+
+}
+
+
+/* =========================
+   KONUM
+========================= */
+
+function getRow(index) {
+
+    return Math.floor(index / SIZE);
+
+}
+
+
+function getCol(index) {
+
+    return index % SIZE;
+
+}
+
+
+/* =========================
+   YOL KONTROLÜ
+========================= */
+
+function isPathClear(arrow) {
+
+    const direction =
+        directions[arrow.direction];
+
+    let row =
+        getRow(arrow.index);
+
+    let col =
+        getCol(arrow.index);
+
+
+    row += direction.dr;
+    col += direction.dc;
+
+
+    while(
+        row >= 0 &&
+        row < SIZE &&
+        col >= 0 &&
+        col < SIZE
+    ) {
+
+        const index =
+            row * SIZE + col;
+
+
+        const blocking =
+            arrows.find(function(a) {
+
+                return (
+                    !a.removed &&
+                    a.index === index
+                );
+
+            });
+
+
+        if(blocking) {
+
+            return false;
+
+        }
+
+
+        row += direction.dr;
+        col += direction.dc;
+
+    }
+
+
+    return true;
+
+}
+
+
+/* =========================
+   OKU ÇIKAR
+========================= */
+
+function moveArrow(arrow) {
+
+    if(arrow.removed) return;
+
+
+    if(!isPathClear(arrow)) {
+
+        lives--;
+
+        updateLives();
+
+        document.getElementById("message")
+            .textContent =
+            "Önü kapalı! ❤️ -1";
+
+
+        arrow.element.style.transform =
+            "translateX(-8px)";
+
+        setTimeout(function() {
+
+            arrow.element.style.transform =
+                "translateX(8px)";
+
+        }, 70);
+
+        setTimeout(function() {
+
+            arrow.element.style.transform =
+                "translateX(0)";
+
+        }, 140);
+
+
+        if(lives <= 0) {
+
+            document.getElementById("message")
+                .textContent =
+                "OYUN BİTTİ!";
+
+            setTimeout(function() {
+
+                lives = 3;
+                level = 1;
+
+                updateLives();
+                createLevel();
+
+            }, 1200);
+
+        }
+
+        return;
+
+    }
+
+
+    arrow.removed = true;
+
+
+    const direction =
+        directions[arrow.direction];
+
+
+    let x = 0;
+    let y = 0;
+
+
+    if(direction.dc > 0) x = 600;
+    if(direction.dc < 0) x = -600;
+    if(direction.dr > 0) y = 600;
+    if(direction.dr < 0) y = -600;
+
+
+    arrow.element.style.transform =
+        `translate(${x}px, ${y}px) scale(1.4)`;
+
+    arrow.element.style.opacity = "0";
+
+
+    setTimeout(function() {
+
+        arrow.element.remove();
+
+        checkWin();
+
+    }, 350);
+
+}
+
+
+/* =========================
+   KAZANMA
+========================= */
+
+function checkWin() {
+
+    const remaining =
+        arrows.filter(function(a) {
+
+            return !a.removed;
+
+        });
+
+
+    if(remaining.length === 0) {
+
+        document.getElementById("message")
+            .textContent =
+            "🎉 LEVEL TAMAMLANDI!";
+
+        document.getElementById("next")
+            .style.display = "block";
+
+    }
+
+}
+
+
+/* =========================
+   SONRAKİ LEVEL
+========================= */
+
+document.getElementById("next")
+.addEventListener("click", function() {
+
+    level++;
+
+    lives = 3;
+
+    updateLives();
+
+    createLevel();
+
+});
+
+
+/* =========================
+   MENÜYE DÖN
+========================= */
+
+document.getElementById("menuButton")
+.addEventListener("click", function() {
+
+    game.style.display = "none";
+    menu.style.display = "flex";
+
+});
+
+
+</script>
+
+</body>
+</html>
