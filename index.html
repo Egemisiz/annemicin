@@ -29,7 +29,7 @@ button {
 }
 
 /* =========================
-   ANA MENÜ
+   MENÜ
 ========================= */
 
 #menu {
@@ -47,7 +47,13 @@ button {
 .menu-subtitle {
     font-size: 18px;
     color: #555;
-    margin-bottom: 45px;
+    margin-bottom: 30px;
+}
+
+.coins {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 12px;
 }
 
 .menu-button {
@@ -71,6 +77,64 @@ button {
 .menu-button.secondary {
     background: white;
     color: #111;
+}
+
+/* =========================
+   SHOP
+========================= */
+
+#shop {
+    display: none;
+    justify-content: center;
+    text-align: center;
+}
+
+.shop-title {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+}
+
+.shop-coins {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.shop-item {
+    width: min(90vw, 360px);
+    border: 3px solid #111;
+    border-radius: 14px;
+    padding: 18px;
+    margin: 8px;
+    background: white;
+}
+
+.shop-item h3 {
+    margin: 0 0 7px;
+    font-size: 21px;
+}
+
+.shop-item p {
+    margin: 5px 0 13px;
+    color: #555;
+}
+
+.shop-item button {
+    border: 2px solid #111;
+    border-radius: 9px;
+    background: #111;
+    color: white;
+    padding: 10px 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.shop-item button:disabled {
+    background: #ddd;
+    color: #777;
+    border-color: #aaa;
 }
 
 /* =========================
@@ -167,6 +231,45 @@ button {
     color: #111;
 }
 
+/* =========================
+   TEMALAR
+========================= */
+
+.dark-theme {
+    background: #111;
+    color: white;
+}
+
+.dark-theme .cell {
+    background: #222;
+}
+
+.dark-theme #board {
+    background: white;
+    border-color: white;
+}
+
+.dark-theme .menu-subtitle,
+.dark-theme .shop-item p {
+    color: #bbb;
+}
+
+.dark-theme .menu-button.secondary,
+.dark-theme .back-button,
+.dark-theme .shop-item {
+    background: #111;
+    color: white;
+    border-color: white;
+}
+
+.gold-arrows .arrow {
+    text-shadow: 0 0 8px #d4af37;
+}
+
+/* =========================
+   MOBİL
+========================= */
+
 @media (max-width: 500px) {
 
     .menu-title {
@@ -183,7 +286,7 @@ button {
 <body>
 
 <!-- =========================
-     ANA MENÜ
+     MENÜ
 ========================= -->
 
 <div id="menu" class="screen">
@@ -196,8 +299,16 @@ button {
         ARROWS PUZZLE ESCAPE
     </div>
 
+    <div class="coins">
+        🪙 <span id="menuCoins">0</span>
+    </div>
+
     <button class="menu-button" id="startButton">
         ▶ BAŞLA
+    </button>
+
+    <button class="menu-button secondary" id="shopButton">
+        🛒 SHOP
     </button>
 
     <button class="menu-button secondary" id="howButton">
@@ -208,7 +319,70 @@ button {
 
 
 <!-- =========================
-     OYUN EKRANI
+     SHOP
+========================= -->
+
+<div id="shop" class="screen">
+
+    <div class="shop-title">
+        SHOP
+    </div>
+
+    <div class="shop-coins">
+        🪙 <span id="shopCoins">0</span>
+    </div>
+
+    <div class="shop-item">
+
+        <h3>❤️ EKSTRA CAN</h3>
+
+        <p>
+            Her level başında 4 can.
+        </p>
+
+        <button id="buyHeart">
+            🪙 100
+        </button>
+
+    </div>
+
+    <div class="shop-item">
+
+        <h3>🌑 KOYU TEMA</h3>
+
+        <p>
+            Oyunun görünümünü değiştir.
+        </p>
+
+        <button id="buyDark">
+            🪙 150
+        </button>
+
+    </div>
+
+    <div class="shop-item">
+
+        <h3>✨ ALTIN OKLAR</h3>
+
+        <p>
+            Oklarına özel görünüm.
+        </p>
+
+        <button id="buyGold">
+            🪙 200
+        </button>
+
+    </div>
+
+    <button class="back-button" id="shopBack">
+        ← MENÜ
+    </button>
+
+</div>
+
+
+<!-- =========================
+     OYUN
 ========================= -->
 
 <div id="game" class="screen">
@@ -248,20 +422,79 @@ button {
 
 <script>
 
-/* =========================
-   OYUN AYARLARI
-========================= */
+/* ==================================================
+   TEMEL AYARLAR
+================================================== */
 
 const SIZE = 6;
 
 let level = 1;
 let lives = 3;
 let arrows = [];
+let levelWon = false;
 
 
-/* =========================
+/* ==================================================
+   COIN SİSTEMİ
+================================================== */
+
+let coins =
+    Number(localStorage.getItem("egeCoins")) || 0;
+
+
+let owned = {
+
+    heart:
+        localStorage.getItem("egeHeart") === "true",
+
+    dark:
+        localStorage.getItem("egeDark") === "true",
+
+    gold:
+        localStorage.getItem("egeGold") === "true"
+
+};
+
+
+function saveData() {
+
+    localStorage.setItem(
+        "egeCoins",
+        coins
+    );
+
+    localStorage.setItem(
+        "egeHeart",
+        owned.heart
+    );
+
+    localStorage.setItem(
+        "egeDark",
+        owned.dark
+    );
+
+    localStorage.setItem(
+        "egeGold",
+        owned.gold
+    );
+
+}
+
+
+function updateCoins() {
+
+    document.getElementById("menuCoins")
+        .textContent = coins;
+
+    document.getElementById("shopCoins")
+        .textContent = coins;
+
+}
+
+
+/* ==================================================
    YÖNLER
-========================= */
+================================================== */
 
 const directions = {
 
@@ -292,9 +525,9 @@ const directions = {
 };
 
 
-/* =========================
-   LEVEL TASARIMLARI
-========================= */
+/* ==================================================
+   SABİT LEVEL TASARIMLARI
+================================================== */
 
 const levels = [
 
@@ -361,27 +594,326 @@ const levels = [
 ];
 
 
-/* =========================
-   EKRANLAR
-========================= */
+/* ==================================================
+   GERÇEK ÇÖZÜLEBİLİRLİK KONTROLÜ
+================================================== */
 
-const menu = document.getElementById("menu");
-const game = document.getElementById("game");
+/*
+   Bir level'ın çözülebilir olması için:
+
+   Herhangi bir anda dışarı çıkabilen en az
+   bir ok bulunmalı.
+
+   O ok kaldırılır.
+
+   Sonra tekrar kontrol edilir.
+
+   Bütün oklar sırayla kaldırılabiliyorsa
+   level çözülebilirdir.
+*/
+
+function canArrowLeave(state, arrowIndex) {
+
+    const arrow = state[arrowIndex];
+
+    const dir =
+        directions[arrow.d];
+
+    let row = arrow.r + dir.dr;
+    let col = arrow.c + dir.dc;
+
+
+    while(
+        row >= 0 &&
+        row < SIZE &&
+        col >= 0 &&
+        col < SIZE
+    ) {
+
+        const blocked =
+            state.some(function(other, index) {
+
+                return (
+                    index !== arrowIndex &&
+                    other.r === row &&
+                    other.c === col
+                );
+
+            });
+
+
+        if(blocked) {
+            return false;
+        }
+
+
+        row += dir.dr;
+        col += dir.dc;
+
+    }
+
+
+    return true;
+
+}
+
+
+function solveLevel(state) {
+
+    if(state.length === 0) {
+        return true;
+    }
+
+
+    for(let i = 0; i < state.length; i++) {
+
+        if(canArrowLeave(state, i)) {
+
+            const nextState =
+                state.filter(function(_, index) {
+
+                    return index !== i;
+
+                });
+
+
+            if(solveLevel(nextState)) {
+                return true;
+            }
+
+        }
+
+    }
+
+
+    return false;
+
+}
+
+
+function isLevelSolvable(data) {
+
+    return solveLevel(
+        data.map(function(item) {
+
+            return {
+                r: item.r,
+                c: item.c,
+                d: item.d
+            };
+
+        })
+    );
+
+}
+
+
+/* ==================================================
+   SEVİYE GÜVENLİĞİ
+================================================== */
+
+function getSafeLevel() {
+
+    const original =
+        levels[(level - 1) % levels.length];
+
+
+    /*
+       Level gerçekten çözülebiliyorsa kullan.
+    */
+
+    if(isLevelSolvable(original)) {
+        return original;
+    }
+
+
+    /*
+       Eski level sorunluysa otomatik olarak
+       basit ve kesin çözülebilir bir level üret.
+    */
+
+    return generateSafeLevel();
+
+}
+
+
+/* ==================================================
+   GARANTİLİ LEVEL ÜRETİCİ
+================================================== */
+
+function generateSafeLevel() {
+
+    const result = [];
+
+    const used = new Set();
+
+    const count =
+        Math.min(
+            5 + Math.floor(level / 2),
+            18
+        );
+
+
+    /*
+       Rastgele oklar oluşturuyoruz.
+       Üretimden sonra çözüm kontrolü yapılıyor.
+    */
+
+    let attempts = 0;
+
+
+    while(
+        result.length < count &&
+        attempts < 500
+    ) {
+
+        attempts++;
+
+
+        const r =
+            Math.floor(Math.random() * SIZE);
+
+        const c =
+            Math.floor(Math.random() * SIZE);
+
+
+        const key =
+            r + "," + c;
+
+
+        if(used.has(key)) {
+            continue;
+        }
+
+
+        const dirs =
+            ["up","down","left","right"];
+
+
+        const d =
+            dirs[
+                Math.floor(
+                    Math.random() * dirs.length
+                )
+            ];
+
+
+        used.add(key);
+
+
+        result.push({
+            r: r,
+            c: c,
+            d: d
+        });
+
+    }
+
+
+    /*
+       Eğer rastgele üretilen level çözülemiyorsa
+       kesin çözülebilir bir şekil oluştur.
+    */
+
+    if(isLevelSolvable(result)) {
+        return result;
+    }
+
+
+    return generateGuaranteedLevel();
+
+}
+
+
+/* ==================================================
+   KESİN GARANTİLİ LEVEL
+================================================== */
+
+function generateGuaranteedLevel() {
+
+    const result = [];
+
+    /*
+       Okları dışarıya doğru yönlendiriyoruz.
+       Böylece her zaman en az birkaç çıkış var.
+    */
+
+    const patterns = [
+
+        {r:1,c:1,d:"up"},
+        {r:1,c:2,d:"up"},
+        {r:1,c:3,d:"up"},
+        {r:2,c:1,d:"left"},
+        {r:2,c:2,d:"up"},
+        {r:2,c:3,d:"right"},
+        {r:3,c:1,d:"left"},
+        {r:3,c:2,d:"down"},
+        {r:3,c:3,d:"right"},
+        {r:4,c:1,d:"down"},
+        {r:4,c:2,d:"down"},
+        {r:4,c:3,d:"right"}
+    ];
+
+
+    const amount =
+        Math.min(
+            patterns.length,
+            5 + Math.floor(level / 2)
+        );
+
+
+    for(let i = 0; i < amount; i++) {
+
+        result.push(patterns[i]);
+
+    }
+
+
+    return result;
+
+}
+
+
+/* ==================================================
+   EKRANLAR
+================================================== */
+
+const menu =
+    document.getElementById("menu");
+
+const game =
+    document.getElementById("game");
+
+const shop =
+    document.getElementById("shop");
+
+
+/* ==================================================
+   BAŞLA
+================================================== */
 
 document.getElementById("startButton")
 .addEventListener("click", function() {
 
     menu.style.display = "none";
+    shop.style.display = "none";
     game.style.display = "flex";
 
     level = 1;
-    lives = 3;
+
+    lives =
+        owned.heart ? 4 : 3;
 
     updateLives();
+
     createLevel();
 
 });
 
+
+/* ==================================================
+   NASIL OYNANIR
+================================================== */
 
 document.getElementById("howButton")
 .addEventListener("click", function() {
@@ -391,31 +923,207 @@ document.getElementById("howButton")
         "Okların üzerine bas.\n" +
         "Önü açıksa ok dışarı çıkar.\n" +
         "Önünde başka ok varsa çıkamaz.\n" +
-        "3 canın var.\n" +
-        "Bütün okları çıkar ve leveli tamamla!"
+        "Yanlış hamle yaparsan can kaybedersin.\n" +
+        "Bütün okları çıkar ve leveli tamamla!\n\n" +
+        "🪙 Her level +25 coin."
     );
 
 });
 
 
-/* =========================
+/* ==================================================
+   SHOP
+================================================== */
+
+document.getElementById("shopButton")
+.addEventListener("click", function() {
+
+    menu.style.display = "none";
+    shop.style.display = "flex";
+
+    updateCoins();
+    updateShopButtons();
+
+});
+
+
+document.getElementById("shopBack")
+.addEventListener("click", function() {
+
+    shop.style.display = "none";
+    menu.style.display = "flex";
+
+});
+
+
+/* ==================================================
+   SHOP BUTONLARI
+================================================== */
+
+function updateShopButtons() {
+
+    const heart =
+        document.getElementById("buyHeart");
+
+    const dark =
+        document.getElementById("buyDark");
+
+    const gold =
+        document.getElementById("buyGold");
+
+
+    heart.disabled = owned.heart;
+    dark.disabled = owned.dark;
+    gold.disabled = owned.gold;
+
+
+    if(owned.heart)
+        heart.textContent = "✓ ALINDI";
+
+    if(owned.dark)
+        dark.textContent = "✓ ALINDI";
+
+    if(owned.gold)
+        gold.textContent = "✓ ALINDI";
+
+}
+
+
+/* ==================================================
+   EKSTRA CAN
+================================================== */
+
+document.getElementById("buyHeart")
+.addEventListener("click", function() {
+
+    if(owned.heart) return;
+
+
+    if(coins < 100) {
+
+        alert("Yeterli coinin yok kk! 🪙");
+
+        return;
+
+    }
+
+
+    coins -= 100;
+
+    owned.heart = true;
+
+    saveData();
+
+    updateCoins();
+
+    updateShopButtons();
+
+});
+
+
+/* ==================================================
+   KOYU TEMA
+================================================== */
+
+document.getElementById("buyDark")
+.addEventListener("click", function() {
+
+    if(owned.dark) return;
+
+
+    if(coins < 150) {
+
+        alert("Yeterli coinin yok kk! 🪙");
+
+        return;
+
+    }
+
+
+    coins -= 150;
+
+    owned.dark = true;
+
+    saveData();
+
+    updateCoins();
+
+    updateShopButtons();
+
+    applyThemes();
+
+});
+
+
+/* ==================================================
+   ALTIN OKLAR
+================================================== */
+
+document.getElementById("buyGold")
+.addEventListener("click", function() {
+
+    if(owned.gold) return;
+
+
+    if(coins < 200) {
+
+        alert("Yeterli coinin yok kk! 🪙");
+
+        return;
+
+    }
+
+
+    coins -= 200;
+
+    owned.gold = true;
+
+    saveData();
+
+    updateCoins();
+
+    updateShopButtons();
+
+    applyThemes();
+
+});
+
+
+/* ==================================================
+   TEMA
+================================================== */
+
+function applyThemes() {
+
+    document.body.classList.toggle(
+        "dark-theme",
+        owned.dark
+    );
+
+    document.body.classList.toggle(
+        "gold-arrows",
+        owned.gold
+    );
+
+}
+
+
+/* ==================================================
    CAN
-========================= */
+================================================== */
 
 function updateLives() {
 
-    const element =
-        document.getElementById("lives");
-
-    element.textContent =
+    document.getElementById("lives")
+        .textContent =
         "❤️ ".repeat(lives).trim();
 
 }
 
 
-/* =========================
+/* ==================================================
    LEVEL OLUŞTUR
-========================= */
+================================================== */
 
 function createLevel() {
 
@@ -426,6 +1134,12 @@ function createLevel() {
 
     arrows = [];
 
+    levelWon = false;
+
+
+    /*
+       Boş hücreleri oluştur.
+    */
 
     for(let i = 0; i < SIZE * SIZE; i++) {
 
@@ -433,6 +1147,7 @@ function createLevel() {
             document.createElement("div");
 
         cell.className = "cell";
+
         cell.dataset.index = i;
 
         board.appendChild(cell);
@@ -440,14 +1155,34 @@ function createLevel() {
     }
 
 
+    /*
+       Önce level'ın çözülüp çözülmediğini kontrol ediyoruz.
+    */
+
     const data =
-        levels[(level - 1) % levels.length];
+        getSafeLevel();
+
+
+    /*
+       Aynı hücreye iki ok gelmesini engelle.
+    */
+
+    const usedCells = new Set();
 
 
     data.forEach(function(item, index) {
 
         const cellIndex =
             item.r * SIZE + item.c;
+
+
+        if(usedCells.has(cellIndex)) {
+            return;
+        }
+
+
+        usedCells.add(cellIndex);
+
 
         const cell =
             board.children[cellIndex];
@@ -456,7 +1191,9 @@ function createLevel() {
         const arrow =
             document.createElement("div");
 
+
         arrow.className = "arrow";
+
 
         arrow.textContent =
             directions[item.d].symbol;
@@ -465,9 +1202,13 @@ function createLevel() {
         const object = {
 
             id: index,
+
             index: cellIndex,
+
             direction: item.d,
+
             element: arrow,
+
             removed: false
 
         };
@@ -475,14 +1216,18 @@ function createLevel() {
 
         arrows.push(object);
 
+
         cell.appendChild(arrow);
 
 
-        arrow.addEventListener("click", function() {
+        arrow.addEventListener(
+            "click",
+            function() {
 
-            moveArrow(object);
+                moveArrow(object);
 
-        });
+            }
+        );
 
     });
 
@@ -490,21 +1235,28 @@ function createLevel() {
     document.getElementById("level")
         .textContent = level;
 
+
     document.getElementById("message")
-        .textContent = "Okları dışarı çıkar!";
+        .textContent =
+        "Okları dışarı çıkar!";
+
 
     document.getElementById("next")
         .style.display = "none";
 
+
     document.getElementById("menuButton")
         .style.display = "block";
+
+
+    applyThemes();
 
 }
 
 
-/* =========================
+/* ==================================================
    KONUM
-========================= */
+================================================== */
 
 function getRow(index) {
 
@@ -520,14 +1272,15 @@ function getCol(index) {
 }
 
 
-/* =========================
+/* ==================================================
    YOL KONTROLÜ
-========================= */
+================================================== */
 
 function isPathClear(arrow) {
 
     const direction =
         directions[arrow.direction];
+
 
     let row =
         getRow(arrow.index);
@@ -580,13 +1333,15 @@ function isPathClear(arrow) {
 }
 
 
-/* =========================
+/* ==================================================
    OKU ÇIKAR
-========================= */
+================================================== */
 
 function moveArrow(arrow) {
 
     if(arrow.removed) return;
+
+    if(levelWon) return;
 
 
     if(!isPathClear(arrow)) {
@@ -594,6 +1349,7 @@ function moveArrow(arrow) {
         lives--;
 
         updateLives();
+
 
         document.getElementById("message")
             .textContent =
@@ -603,12 +1359,14 @@ function moveArrow(arrow) {
         arrow.element.style.transform =
             "translateX(-8px)";
 
+
         setTimeout(function() {
 
             arrow.element.style.transform =
                 "translateX(8px)";
 
         }, 70);
+
 
         setTimeout(function() {
 
@@ -624,17 +1382,18 @@ function moveArrow(arrow) {
                 .textContent =
                 "OYUN BİTTİ!";
 
+
             setTimeout(function() {
 
-                lives = 3;
-                level = 1;
+                lives =
+                    owned.heart ? 4 : 3;
 
-                updateLives();
                 createLevel();
 
             }, 1200);
 
         }
+
 
         return;
 
@@ -652,14 +1411,22 @@ function moveArrow(arrow) {
     let y = 0;
 
 
-    if(direction.dc > 0) x = 600;
-    if(direction.dc < 0) x = -600;
-    if(direction.dr > 0) y = 600;
-    if(direction.dr < 0) y = -600;
+    if(direction.dc > 0)
+        x = 600;
+
+    if(direction.dc < 0)
+        x = -600;
+
+    if(direction.dr > 0)
+        y = 600;
+
+    if(direction.dr < 0)
+        y = -600;
 
 
     arrow.element.style.transform =
         `translate(${x}px, ${y}px) scale(1.4)`;
+
 
     arrow.element.style.opacity = "0";
 
@@ -675,9 +1442,9 @@ function moveArrow(arrow) {
 }
 
 
-/* =========================
+/* ==================================================
    KAZANMA
-========================= */
+================================================== */
 
 function checkWin() {
 
@@ -689,11 +1456,26 @@ function checkWin() {
         });
 
 
-    if(remaining.length === 0) {
+    if(
+        remaining.length === 0 &&
+        !levelWon
+    ) {
+
+        levelWon = true;
+
+
+        coins += 25;
+
+
+        saveData();
+
+        updateCoins();
+
 
         document.getElementById("message")
             .textContent =
-            "🎉 LEVEL TAMAMLANDI!";
+            "🎉 LEVEL TAMAMLANDI! +25 🪙";
+
 
         document.getElementById("next")
             .style.display = "block";
@@ -703,16 +1485,22 @@ function checkWin() {
 }
 
 
-/* =========================
+/* ==================================================
    SONRAKİ LEVEL
-========================= */
+================================================== */
 
 document.getElementById("next")
 .addEventListener("click", function() {
 
+    if(!levelWon) return;
+
+
     level++;
 
-    lives = 3;
+
+    lives =
+        owned.heart ? 4 : 3;
+
 
     updateLives();
 
@@ -721,18 +1509,29 @@ document.getElementById("next")
 });
 
 
-/* =========================
-   MENÜYE DÖN
-========================= */
+/* ==================================================
+   MENÜ
+================================================== */
 
 document.getElementById("menuButton")
 .addEventListener("click", function() {
 
     game.style.display = "none";
+
     menu.style.display = "flex";
+
+    updateCoins();
 
 });
 
+
+/* ==================================================
+   BAŞLANGIÇ
+================================================== */
+
+updateCoins();
+
+applyThemes();
 
 </script>
 
