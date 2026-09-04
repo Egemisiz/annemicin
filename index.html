@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -31,7 +30,11 @@ button {
 }
 
 #menu,
-#shop {
+#shop,
+#missions,
+#settings,
+#achievements,
+#daily {
     justify-content: center;
     text-align: center;
 }
@@ -50,7 +53,13 @@ button {
 .menu-subtitle {
     font-size: 18px;
     color: #555;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
+}
+
+.player-name {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .coins {
@@ -59,10 +68,16 @@ button {
     margin-bottom: 12px;
 }
 
+.streak {
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
 .menu-button {
     width: 240px;
     padding: 17px;
-    margin: 7px;
+    margin: 6px;
     border: 3px solid #111;
     border-radius: 12px;
     background: #111;
@@ -115,7 +130,8 @@ button {
 }
 
 .shop-item button,
-.back-button {
+.back-button,
+.setting-button {
     border: 2px solid #111;
     border-radius: 9px;
     background: #111;
@@ -134,6 +150,91 @@ button {
 
 .back-button {
     margin-top: 12px;
+}
+
+.panel {
+    width: min(92vw, 430px);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.panel-item {
+    width: 100%;
+    border: 3px solid #111;
+    border-radius: 14px;
+    padding: 15px;
+    margin: 7px 0;
+    background: white;
+}
+
+.panel-item h3 {
+    margin: 0 0 7px;
+}
+
+.panel-item p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.progress {
+    width: 100%;
+    height: 13px;
+    border: 2px solid #111;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #111;
+    transition: .3s;
+}
+
+.completed {
+    opacity: .65;
+}
+
+.completed::after {
+    content: " ✓";
+    font-weight: bold;
+}
+
+.name-box {
+    width: min(85vw, 350px);
+    padding: 14px;
+    font-size: 18px;
+    border: 3px solid #111;
+    border-radius: 10px;
+    text-align: center;
+    outline: none;
+    margin: 10px 0;
+}
+
+#nameScreen {
+    position: fixed;
+    inset: 0;
+    background: white;
+    color: #111;
+    z-index: 1000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.name-title {
+    font-size: 40px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.name-subtitle {
+    width: min(90vw, 450px);
+    color: #555;
+    margin: 10px 0;
 }
 
 #title {
@@ -238,13 +339,17 @@ button {
 }
 
 .dark-theme .menu-subtitle,
-.dark-theme .shop-item p {
+.dark-theme .shop-item p,
+.dark-theme .panel-item p,
+.dark-theme .name-subtitle {
     color: #bbb;
 }
 
 .dark-theme .menu-button.secondary,
 .dark-theme .back-button,
-.dark-theme .shop-item {
+.dark-theme .shop-item,
+.dark-theme .panel-item,
+.dark-theme .setting-button {
     background: #111;
     color: white;
     border-color: white;
@@ -253,6 +358,19 @@ button {
 .dark-theme .shop-item button {
     background: white;
     color: #111;
+}
+
+.dark-theme .progress {
+    border-color: white;
+}
+
+.dark-theme .progress-bar {
+    background: white;
+}
+
+.dark-theme #nameScreen {
+    background: #111;
+    color: white;
 }
 
 .gold-arrows .arrow {
@@ -273,149 +391,429 @@ button {
     }
 }
 </style>
-
 </head>
 
 <body>
 
+<!-- =========================
+     İSİM EKRANI
+========================= -->
+
+<div id="nameScreen">
+
+    <div class="name-title">EGE</div>
+
+    <div class="name-subtitle" id="nameDescription">
+        Oyuna başlamadan önce bir isim seç.
+    </div>
+
+    <input
+        id="nameInput"
+        class="name-box"
+        maxlength="16"
+        placeholder="Oyuncu adı"
+    >
+
+    <button class="menu-button" id="nameSaveButton">
+        DEVAM ET ➜
+    </button>
+
+</div>
+
+
+<!-- =========================
+     MENÜ
+========================= -->
+
 <div id="menu" class="screen">
 
-```
-<div class="menu-title">
-    EGE
-</div>
+    <div class="menu-title">
+        EGE
+    </div>
 
-<div class="menu-subtitle">
-    ARROWS PUZZLE ESCAPE
-</div>
+    <div class="menu-subtitle">
+        ARROWS PUZZLE ESCAPE
+    </div>
 
-<div class="coins">
-    🪙 <span id="menuCoins">0</span>
-</div>
+    <div class="player-name">
+        👤 <span id="playerName">Oyuncu</span>
+    </div>
 
-<button class="menu-button" id="startButton">
-    ▶ BAŞLA
-</button>
+    <div class="coins">
+        🪙 <span id="menuCoins">0</span>
+    </div>
 
-<button class="menu-button secondary" id="shopButton">
-    🛒 SHOP
-</button>
+    <div class="streak">
+        🔥 <span id="streakText">0</span>
+    </div>
 
-<button class="menu-button secondary" id="howButton">
-    ? NASIL OYNANIR
-</button>
-```
-
-</div>
-
-<div id="shop" class="screen">
-
-```
-<div class="shop-title">
-    SHOP
-</div>
-
-<div class="shop-coins">
-    🪙 <span id="shopCoins">0</span>
-</div>
-
-<div class="shop-item">
-    <h3>❤️ EKSTRA CAN</h3>
-    <p>Her level başında +1 can.</p>
-    <button id="buyHeart">
-        🪙 100
+    <button class="menu-button" id="startButton">
+        ▶ BAŞLA
     </button>
-</div>
 
-<div class="shop-item">
-    <h3>🌑 KOYU TEMA</h3>
-    <p>Oyunun görünümünü değiştir.</p>
-    <button id="buyDark">
-        🪙 150
+    <button class="menu-button secondary" id="shopButton">
+        🛒 SHOP
     </button>
-</div>
 
-<div class="shop-item">
-    <h3>✨ ALTIN OKLAR</h3>
-    <p>Oklarına özel altın görünüm.</p>
-    <button id="buyGold">
-        🪙 200
+    <button class="menu-button secondary" id="missionsButton">
+        🎯 GÖREVLER
     </button>
-</div>
 
-<div class="shop-item">
-    <h3>🪙 COIN BOOST</h3>
-    <p>Kalıcı olarak para çarpanını +1 artırır.</p>
-    <button id="buyBoost">
-        🪙 500
+    <button class="menu-button secondary" id="achievementsButton">
+        🏆 BAŞARIMLAR
     </button>
-</div>
 
-<div class="shop-item">
-    <h3>💖 CAN UPGRADE</h3>
-    <p>Başlangıç canına +2 ekler.</p>
-    <button id="buyLifeUpgrade">
-        🪙 350
+    <button class="menu-button secondary" id="dailyButton">
+        🎁 GÜNLÜK ÖDÜL
     </button>
+
+    <button class="menu-button secondary" id="settingsButton">
+        ⚙️ AYARLAR
+    </button>
+
+    <button class="menu-button secondary" id="howButton">
+        ? NASIL OYNANIR
+    </button>
+
 </div>
 
-<button class="back-button" id="shopBack">
-    ← MENÜ
-</button>
-```
+
+<!-- =========================
+     SHOP
+========================= -->
+
+<div id="shop" class="screen" style="display:none;">
+
+    <div class="shop-title">
+        SHOP
+    </div>
+
+    <div class="shop-coins">
+        🪙 <span id="shopCoins">0</span>
+    </div>
+
+    <div class="shop-item">
+        <h3>❤️ EKSTRA CAN</h3>
+        <p>Her level başında +1 can.</p>
+        <button id="buyHeart">🪙 100</button>
+    </div>
+
+    <div class="shop-item">
+        <h3>🌑 KOYU TEMA</h3>
+        <p>Oyunun görünümünü değiştir.</p>
+        <button id="buyDark">🪙 150</button>
+    </div>
+
+    <div class="shop-item">
+        <h3>✨ ALTIN OKLAR</h3>
+        <p>Oklarına özel altın görünüm.</p>
+        <button id="buyGold">🪙 200</button>
+    </div>
+
+    <div class="shop-item">
+        <h3>🪙 COIN BOOST</h3>
+        <p>Kalıcı olarak para çarpanını +1 artırır.</p>
+        <button id="buyBoost">🪙 500</button>
+    </div>
+
+    <div class="shop-item">
+        <h3>💖 CAN UPGRADE</h3>
+        <p>Başlangıç canına +2 ekler.</p>
+        <button id="buyLifeUpgrade">🪙 350</button>
+    </div>
+
+    <button class="back-button" id="shopBack">
+        ← MENÜ
+    </button>
 
 </div>
+
+
+<!-- =========================
+     GÖREVLER
+========================= -->
+
+<div id="missions" class="screen" style="display:none;">
+
+    <div class="shop-title">🎯 GÖREVLER</div>
+
+    <div class="shop-coins">
+        🪙 <span id="missionCoins">0</span>
+    </div>
+
+    <div class="panel">
+
+        <div class="panel-item" id="mission1Box">
+            <h3>🎮 5 LEVEL TAMAMLA</h3>
+            <p>
+                <span id="mission1Progress">0</span> / 5
+            </p>
+            <div class="progress">
+                <div class="progress-bar" id="mission1Bar"></div>
+            </div>
+            <button class="setting-button" id="mission1Button">
+                🪙 75 AL
+            </button>
+        </div>
+
+        <div class="panel-item" id="mission2Box">
+            <h3>❤️ 3 LEVEL CAN KAYBETMEDEN</h3>
+            <p>
+                <span id="mission2Progress">0</span> / 3
+            </p>
+            <div class="progress">
+                <div class="progress-bar" id="mission2Bar"></div>
+            </div>
+            <button class="setting-button" id="mission2Button">
+                🪙 125 AL
+            </button>
+        </div>
+
+        <div class="panel-item" id="mission3Box">
+            <h3>🏃 10 LEVEL TAMAMLA</h3>
+            <p>
+                <span id="mission3Progress">0</span> / 10
+            </p>
+            <div class="progress">
+                <div class="progress-bar" id="mission3Bar"></div>
+            </div>
+            <button class="setting-button" id="mission3Button">
+                🪙 200 AL
+            </button>
+        </div>
+
+    </div>
+
+    <button class="back-button" id="missionsBack">
+        ← MENÜ
+    </button>
+
+</div>
+
+
+<!-- =========================
+     BAŞARIMLAR
+========================= -->
+
+<div id="achievements" class="screen" style="display:none;">
+
+    <div class="shop-title">🏆 BAŞARIMLAR</div>
+
+    <div class="panel">
+
+        <div class="panel-item" id="achFirst">
+            <h3>🎯 İLK ADIM</h3>
+            <p>İlk levelini tamamla.</p>
+        </div>
+
+        <div class="panel-item" id="ach10">
+            <h3>🔥 ISINIYORSUN</h3>
+            <p>10 level tamamla.</p>
+        </div>
+
+        <div class="panel-item" id="ach50">
+            <h3>⚡ USTA</h3>
+            <p>50 level tamamla.</p>
+        </div>
+
+        <div class="panel-item" id="ach100">
+            <h3>👑 EFSANE</h3>
+            <p>100 level tamamla.</p>
+        </div>
+
+        <div class="panel-item" id="achRich">
+            <h3>💰 ZENGİN</h3>
+            <p>1000 coin biriktir.</p>
+        </div>
+
+    </div>
+
+    <button class="back-button" id="achievementsBack">
+        ← MENÜ
+    </button>
+
+</div>
+
+
+<!-- =========================
+     GÜNLÜK ÖDÜL
+========================= -->
+
+<div id="daily" class="screen" style="display:none;">
+
+    <div class="shop-title">🎁 GÜNLÜK ÖDÜL</div>
+
+    <div class="panel">
+
+        <div class="panel-item">
+
+            <h3>🔥 GÜNLÜK SERİ</h3>
+
+            <p>
+                <span id="dailyStreakNumber">0</span> günlük seri
+            </p>
+
+            <p id="dailyRewardText">
+                Bugünkü ödülünü al!
+            </p>
+
+            <button
+                class="setting-button"
+                id="dailyClaimButton"
+            >
+                🎁 ÖDÜLÜ AL
+            </button>
+
+        </div>
+
+    </div>
+
+    <button class="back-button" id="dailyBack">
+        ← MENÜ
+    </button>
+
+</div>
+
+
+<!-- =========================
+     AYARLAR
+========================= -->
+
+<div id="settings" class="screen" style="display:none;">
+
+    <div class="shop-title">⚙️ AYARLAR</div>
+
+    <div class="panel">
+
+        <div class="panel-item">
+
+            <h3>👤 İSİM</h3>
+
+            <p id="settingsName">
+                Oyuncu
+            </p>
+
+            <input
+                id="changeNameInput"
+                class="name-box"
+                maxlength="16"
+                placeholder="Yeni isim"
+            >
+
+            <button
+                class="setting-button"
+                id="changeNameButton"
+            >
+                ✏️ İSMİ DEĞİŞTİR
+            </button>
+
+        </div>
+
+        <div class="panel-item">
+
+            <h3>🌐 DİL</h3>
+
+            <button
+                class="setting-button"
+                id="turkishButton"
+            >
+                🇹🇷 TÜRKÇE
+            </button>
+
+            <button
+                class="setting-button"
+                id="englishButton"
+            >
+                🇬🇧 ENGLISH
+            </button>
+
+        </div>
+
+    </div>
+
+    <button class="back-button" id="settingsBack">
+        ← MENÜ
+    </button>
+
+</div>
+
+
+<!-- =========================
+     OYUN
+========================= -->
 
 <div id="game" class="screen">
 
-```
-<div id="title">
-    EGE
-</div>
+    <div id="title">
+        EGE
+    </div>
 
-<div id="info">
+    <div id="info">
 
-    <span>
-        LEVEL <span id="level">1</span>
-    </span>
+        <span>
+            LEVEL <span id="level">1</span>
+        </span>
 
-    <span id="lives">
-        ❤️ ❤️ ❤️
-    </span>
+        <span id="lives">
+            ❤️ ❤️ ❤️
+        </span>
 
-    <span>
-        🪙 x<span id="multiplier">1</span>
-    </span>
+        <span>
+            🪙 x<span id="multiplier">1</span>
+        </span>
 
-</div>
+    </div>
 
-<div id="board"></div>
+    <div id="board"></div>
 
-<div id="message">
-    Okları dışarı çıkar!
-</div>
+    <div id="message">
+        Okları dışarı çıkar!
+    </div>
 
-<button id="next" class="game-button">
-    SONRAKİ LEVEL ➜
-</button>
+    <button id="next" class="game-button">
+        SONRAKİ LEVEL ➜
+    </button>
 
-<button id="menuButton" class="game-button">
-    MENÜYE DÖN
-</button>
-```
+    <button id="menuButton" class="game-button">
+        MENÜYE DÖN
+    </button>
 
 </div>
+
 
 <script>
 
 const SIZE = 6;
 
-let level = Number(localStorage.getItem("egeLevel")) || 1;
-let coins = Number(localStorage.getItem("egeCoins")) || 0;
+
+/* ==========================================
+   TEMEL VERİLER
+========================================== */
+
+let level =
+    Number(localStorage.getItem("egeLevel")) || 1;
+
+let coins =
+    Number(localStorage.getItem("egeCoins")) || 0;
+
+let playerName =
+    localStorage.getItem("egePlayerName") || "";
+
+let language =
+    localStorage.getItem("egeLanguage") || "tr";
 
 let lives = 3;
+
 let arrows = [];
+
 let levelWon = false;
+
+let currentLevelLostLife = false;
+
+
+/* ==========================================
+   SHOP
+========================================== */
 
 let owned = {
 
@@ -437,11 +835,134 @@ let owned = {
 };
 
 
+/* ==========================================
+   GÖREVLER
+========================================== */
+
+let missions = {
+
+    completedLevels:
+        Number(localStorage.getItem("egeMissionLevels")) || 0,
+
+    noLifeLoss:
+        Number(localStorage.getItem("egeMissionNoLife")) || 0,
+
+    tenLevels:
+        Number(localStorage.getItem("egeMissionTen")) || 0,
+
+    reward1:
+        localStorage.getItem("egeMissionReward1") === "true",
+
+    reward2:
+        localStorage.getItem("egeMissionReward2") === "true",
+
+    reward3:
+        localStorage.getItem("egeMissionReward3") === "true"
+
+};
+
+
+/* ==========================================
+   İSTATİSTİKLER
+========================================== */
+
+let totalCompleted =
+    Number(localStorage.getItem("egeCompletedLevels")) || 0;
+
+let totalCoinsEarned =
+    Number(localStorage.getItem("egeTotalCoinsEarned")) || 0;
+
+
+/* ==========================================
+   GÜNLÜK SİSTEM
+========================================== */
+
+let streak =
+    Number(localStorage.getItem("egeStreak")) || 0;
+
+let lastLogin =
+    localStorage.getItem("egeLastLogin") || "";
+
+let dailyClaimed =
+    localStorage.getItem("egeDailyClaimed") === "true";
+
+
+/* ==========================================
+   DİL
+========================================== */
+
+const translations = {
+
+    tr: {
+
+        start: "▶ BAŞLA",
+        shop: "🛒 SHOP",
+        missions: "🎯 GÖREVLER",
+        achievements: "🏆 BAŞARIMLAR",
+        daily: "🎁 GÜNLÜK ÖDÜL",
+        settings: "⚙️ AYARLAR",
+        how: "? NASIL OYNANIR",
+        menu: "← MENÜ",
+        next: "SONRAKİ LEVEL ➜",
+        menuReturn: "MENÜYE DÖN",
+        playMessage: "Okları dışarı çıkar!",
+        player: "Oyuncu"
+
+    },
+
+    en: {
+
+        start: "▶ START",
+        shop: "🛒 SHOP",
+        missions: "🎯 MISSIONS",
+        achievements: "🏆 ACHIEVEMENTS",
+        daily: "🎁 DAILY REWARD",
+        settings: "⚙️ SETTINGS",
+        how: "? HOW TO PLAY",
+        menu: "← MENU",
+        next: "NEXT LEVEL ➜",
+        menuReturn: "RETURN TO MENU",
+        playMessage: "Get the arrows out!",
+        player: "Player"
+
+    }
+
+};
+
+
+function t(key) {
+
+    return translations[language][key] ||
+           translations.tr[key];
+
+}
+
+
+/* ==========================================
+   KAYDET
+========================================== */
+
 function saveData() {
 
-    localStorage.setItem("egeLevel", level);
+    localStorage.setItem(
+        "egeLevel",
+        level
+    );
 
-    localStorage.setItem("egeCoins", coins);
+    localStorage.setItem(
+        "egeCoins",
+        coins
+    );
+
+    localStorage.setItem(
+        "egePlayerName",
+        playerName
+    );
+
+    localStorage.setItem(
+        "egeLanguage",
+        language
+    );
 
     localStorage.setItem(
         "egeHeart",
@@ -468,51 +989,264 @@ function saveData() {
         owned.lifeUpgrade
     );
 
+    localStorage.setItem(
+        "egeMissionLevels",
+        missions.completedLevels
+    );
+
+    localStorage.setItem(
+        "egeMissionNoLife",
+        missions.noLifeLoss
+    );
+
+    localStorage.setItem(
+        "egeMissionTen",
+        missions.tenLevels
+    );
+
+    localStorage.setItem(
+        "egeMissionReward1",
+        missions.reward1
+    );
+
+    localStorage.setItem(
+        "egeMissionReward2",
+        missions.reward2
+    );
+
+    localStorage.setItem(
+        "egeMissionReward3",
+        missions.reward3
+    );
+
+    localStorage.setItem(
+        "egeCompletedLevels",
+        totalCompleted
+    );
+
+    localStorage.setItem(
+        "egeTotalCoinsEarned",
+        totalCoinsEarned
+    );
+
+    localStorage.setItem(
+        "egeStreak",
+        streak
+    );
+
+    localStorage.setItem(
+        "egeLastLogin",
+        lastLogin
+    );
+
+    localStorage.setItem(
+        "egeDailyClaimed",
+        dailyClaimed
+    );
+
 }
 
+
+/* ==========================================
+   TARİH
+========================================== */
+
+function getToday() {
+
+    const now = new Date();
+
+    return (
+        now.getFullYear() +
+        "-" +
+        String(now.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(now.getDate()).padStart(2, "0")
+    );
+
+}
+
+
+function getYesterday() {
+
+    const date = new Date();
+
+    date.setDate(
+        date.getDate() - 1
+    );
+
+    return (
+        date.getFullYear() +
+        "-" +
+        String(date.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(date.getDate()).padStart(2, "0")
+    );
+
+}
+
+
+/* ==========================================
+   GÜNLÜK GİRİŞ
+========================================== */
+
+function checkDailyLogin() {
+
+    const today =
+        getToday();
+
+    const yesterday =
+        getYesterday();
+
+
+    if(lastLogin === today) {
+
+        return;
+
+    }
+
+
+    if(lastLogin === yesterday) {
+
+        streak++;
+
+    } else {
+
+        streak = 1;
+
+    }
+
+
+    lastLogin = today;
+
+    dailyClaimed = false;
+
+    saveData();
+
+}
+
+
+/* ==========================================
+   GÜNLÜK ÖDÜL
+========================================== */
+
+function getDailyReward() {
+
+    return Math.min(
+        100 + ((streak - 1) * 25),
+        500
+    );
+
+}
+
+
+function updateDaily() {
+
+    document.getElementById(
+        "dailyStreakNumber"
+    ).textContent = streak;
+
+
+    const button =
+        document.getElementById(
+            "dailyClaimButton"
+        );
+
+
+    const text =
+        document.getElementById(
+            "dailyRewardText"
+        );
+
+
+    if(dailyClaimed) {
+
+        text.textContent =
+            language === "tr"
+            ? "Bugünkü ödülünü zaten aldın! Yarın tekrar gel 🔥"
+            : "You already claimed today's reward! Come back tomorrow 🔥";
+
+        button.textContent =
+            language === "tr"
+            ? "✓ ALINDI"
+            : "✓ CLAIMED";
+
+        button.disabled = true;
+
+    } else {
+
+        text.textContent =
+            language === "tr"
+            ? "Bugünkü ödül: 🪙 " + getDailyReward()
+            : "Today's reward: 🪙 " + getDailyReward();
+
+        button.textContent =
+            language === "tr"
+            ? "🎁 ÖDÜLÜ AL"
+            : "🎁 CLAIM REWARD";
+
+        button.disabled = false;
+
+    }
+
+}
+
+
+/* ==========================================
+   COIN
+========================================== */
 
 function updateCoins() {
 
-    document.getElementById("menuCoins")
-        .textContent = coins;
+    document.getElementById(
+        "menuCoins"
+    ).textContent = coins;
 
-    document.getElementById("shopCoins")
-        .textContent = coins;
+    document.getElementById(
+        "shopCoins"
+    ).textContent = coins;
+
+    document.getElementById(
+        "missionCoins"
+    ).textContent = coins;
 
 }
 
 
+/* ==========================================
+   ÇARPAN
+========================================== */
+
 function getBaseMultiplier() {
 
-    /*
-       Her 100 levelde +1.
-
-       1-99   = x1
-       100-199 = x2
-       200-299 = x3
-       300-399 = x4
-       ...
-    */
-
-    return 1 + Math.floor((level - 1) / 100);
+    return 1 +
+        Math.floor(
+            (level - 1) / 100
+        );
 
 }
 
 
 function getMultiplier() {
 
-    return getBaseMultiplier() + owned.boost;
+    return getBaseMultiplier() +
+           owned.boost;
 
 }
 
 
 function updateMultiplier() {
 
-    document.getElementById("multiplier")
-        .textContent = getMultiplier();
+    document.getElementById(
+        "multiplier"
+    ).textContent =
+        getMultiplier();
 
 }
 
+
+/* ==========================================
+   CAN
+========================================== */
 
 function getMaxLives() {
 
@@ -530,6 +1264,20 @@ function getMaxLives() {
 
 }
 
+
+function updateLives() {
+
+    document.getElementById(
+        "lives"
+    ).textContent =
+        "❤️ ".repeat(lives).trim();
+
+}
+
+
+/* ==========================================
+   YÖNLER
+========================================== */
 
 const directions = {
 
@@ -560,6 +1308,10 @@ const directions = {
 };
 
 
+/* ==========================================
+   EKRANLAR
+========================================== */
+
 const menu =
     document.getElementById("menu");
 
@@ -569,22 +1321,990 @@ const game =
 const shop =
     document.getElementById("shop");
 
+const missionsScreen =
+    document.getElementById("missions");
+
+const settingsScreen =
+    document.getElementById("settings");
+
+const achievementsScreen =
+    document.getElementById("achievements");
+
+const dailyScreen =
+    document.getElementById("daily");
+
+
+function hideAllScreens() {
+
+    menu.style.display = "none";
+    shop.style.display = "none";
+    missionsScreen.style.display = "none";
+    settingsScreen.style.display = "none";
+    achievementsScreen.style.display = "none";
+    dailyScreen.style.display = "none";
+    game.style.display = "none";
+
+}
+
 
 /* ==========================================
-   LEVEL ÜRETİMİ
-
-   Level her zaman çözülebilir.
-
-   Mantık:
-   Okları bir sırayla ekliyoruz.
-   Yeni eklenen okun çıkış yolu,
-   daha önce eklenen oklarla kapanmıyor.
-
-   Son eklenen ok çıkarılabilir.
-   Sonra bir önceki...
-   Böylece level'ın çözümü garanti.
+   İSİM
 ========================================== */
 
+function showNameScreen() {
+
+    document.getElementById(
+        "nameScreen"
+    ).style.display = "flex";
+
+}
+
+
+function hideNameScreen() {
+
+    document.getElementById(
+        "nameScreen"
+    ).style.display = "none";
+
+}
+
+
+document.getElementById(
+    "nameSaveButton"
+)
+.addEventListener("click", function() {
+
+    const input =
+        document.getElementById(
+            "nameInput"
+        );
+
+    let name =
+        input.value.trim();
+
+
+    if(name.length < 2) {
+
+        alert(
+            language === "tr"
+            ? "En az 2 karakterlik bir isim yaz!"
+            : "Enter a name with at least 2 characters!"
+        );
+
+        return;
+
+    }
+
+
+    playerName = name;
+
+    saveData();
+
+    hideNameScreen();
+
+    updatePlayerName();
+
+});
+
+
+function updatePlayerName() {
+
+    document.getElementById(
+        "playerName"
+    ).textContent =
+        playerName ||
+        t("player");
+
+    document.getElementById(
+        "settingsName"
+    ).textContent =
+        playerName ||
+        t("player");
+
+}
+
+
+/* ==========================================
+   AYARLAR
+========================================== */
+
+document.getElementById(
+    "settingsButton"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    settingsScreen.style.display =
+        "flex";
+
+    updatePlayerName();
+
+});
+
+
+document.getElementById(
+    "settingsBack"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    menu.style.display =
+        "flex";
+
+});
+
+
+document.getElementById(
+    "changeNameButton"
+)
+.addEventListener("click", function() {
+
+    const input =
+        document.getElementById(
+            "changeNameInput"
+        );
+
+    const name =
+        input.value.trim();
+
+
+    if(name.length < 2) {
+
+        alert(
+            language === "tr"
+            ? "En az 2 karakterlik bir isim yaz!"
+            : "Enter a name with at least 2 characters!"
+        );
+
+        return;
+
+    }
+
+
+    playerName = name;
+
+    input.value = "";
+
+    saveData();
+
+    updatePlayerName();
+
+    alert(
+        language === "tr"
+        ? "İsmin değiştirildi! 👤"
+        : "Your name has been changed! 👤"
+    );
+
+});
+
+
+document.getElementById(
+    "turkishButton"
+)
+.addEventListener("click", function() {
+
+    language = "tr";
+
+    saveData();
+
+    applyLanguage();
+
+});
+
+
+document.getElementById(
+    "englishButton"
+)
+.addEventListener("click", function() {
+
+    language = "en";
+
+    saveData();
+
+    applyLanguage();
+
+});
+
+
+/* ==========================================
+   DİL UYGULA
+========================================== */
+
+function applyLanguage() {
+
+    document.documentElement.lang =
+        language;
+
+
+    document.getElementById(
+        "startButton"
+    ).textContent = t("start");
+
+    document.getElementById(
+        "shopButton"
+    ).textContent = t("shop");
+
+    document.getElementById(
+        "missionsButton"
+    ).textContent = t("missions");
+
+    document.getElementById(
+        "achievementsButton"
+    ).textContent = t("achievements");
+
+    document.getElementById(
+        "dailyButton"
+    ).textContent = t("daily");
+
+    document.getElementById(
+        "settingsButton"
+    ).textContent = t("settings");
+
+    document.getElementById(
+        "howButton"
+    ).textContent = t("how");
+
+    document.getElementById(
+        "shopBack"
+    ).textContent = t("menu");
+
+    document.getElementById(
+        "missionsBack"
+    ).textContent = t("menu");
+
+    document.getElementById(
+        "achievementsBack"
+    ).textContent = t("menu");
+
+    document.getElementById(
+        "dailyBack"
+    ).textContent = t("menu");
+
+    document.getElementById(
+        "settingsBack"
+    ).textContent = t("menu");
+
+    document.getElementById(
+        "next"
+    ).textContent = t("next");
+
+    document.getElementById(
+        "menuButton"
+    ).textContent = t("menuReturn");
+
+
+    document.getElementById(
+        "changeNameInput"
+    ).placeholder =
+        language === "tr"
+        ? "Yeni isim"
+        : "New name";
+
+
+    updatePlayerName();
+
+    updateDaily();
+
+}
+
+
+/* ==========================================
+   BAŞLA
+========================================== */
+
+document.getElementById(
+    "startButton"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    game.style.display =
+        "flex";
+
+
+    lives =
+        getMaxLives();
+
+    updateLives();
+
+    updateMultiplier();
+
+    createLevel();
+
+});
+
+
+/* ==========================================
+   NASIL OYNANIR
+========================================== */
+
+document.getElementById(
+    "howButton"
+)
+.addEventListener("click", function() {
+
+    if(language === "tr") {
+
+        alert(
+            "🎮 NASIL OYNANIR?\n\n" +
+            "Okların üzerine bas.\n" +
+            "Önü açıksa ok dışarı çıkar.\n" +
+            "Önünde başka ok varsa çıkamaz.\n" +
+            "Yanlış hamlede 1 can kaybedersin.\n\n" +
+            "🪙 Level tamamlayınca coin kazanırsın.\n" +
+            "💰 Coin ödülün çarpanınla artar.\n" +
+            "🔥 Her gün girerek serini artırabilirsin.\n" +
+            "🎯 Görevleri tamamlayarak ekstra coin kazan.\n" +
+            "🏆 Başarımları aç.\n" +
+            "⚡ Her 10 levelde özel bölüm gelir.\n\n" +
+            "Levelin otomatik kaydedilir!"
+        );
+
+    } else {
+
+        alert(
+            "🎮 HOW TO PLAY?\n\n" +
+            "Click the arrows.\n" +
+            "If the path is clear, the arrow escapes.\n" +
+            "If another arrow blocks it, you lose a life.\n\n" +
+            "🪙 Earn coins by completing levels.\n" +
+            "🔥 Build your daily streak.\n" +
+            "🎯 Complete missions for extra coins.\n" +
+            "🏆 Unlock achievements.\n" +
+            "⚡ Special levels appear every 10 levels.\n\n" +
+            "Your level is saved automatically!"
+        );
+
+    }
+
+});
+
+
+/* ==========================================
+   SHOP
+========================================== */
+
+document.getElementById(
+    "shopButton"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    shop.style.display =
+        "flex";
+
+    updateCoins();
+
+    updateShopButtons();
+
+});
+
+
+document.getElementById(
+    "shopBack"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    menu.style.display =
+        "flex";
+
+    updateCoins();
+
+});
+
+
+function updateShopButtons() {
+
+    const heart =
+        document.getElementById("buyHeart");
+
+    const dark =
+        document.getElementById("buyDark");
+
+    const gold =
+        document.getElementById("buyGold");
+
+    const boost =
+        document.getElementById("buyBoost");
+
+    const lifeUpgrade =
+        document.getElementById("buyLifeUpgrade");
+
+
+    heart.disabled =
+        owned.heart;
+
+    dark.disabled =
+        owned.dark;
+
+    gold.disabled =
+        owned.gold;
+
+    boost.disabled =
+        owned.boost >= 1;
+
+    lifeUpgrade.disabled =
+        owned.lifeUpgrade;
+
+
+    if(owned.heart)
+        heart.textContent = "✓ ALINDI";
+
+    if(owned.dark)
+        dark.textContent = "✓ ALINDI";
+
+    if(owned.gold)
+        gold.textContent = "✓ ALINDI";
+
+    if(owned.boost >= 1)
+        boost.textContent = "✓ ALINDI";
+
+    if(owned.lifeUpgrade)
+        lifeUpgrade.textContent = "✓ ALINDI";
+
+}
+
+
+/* SHOP ALIŞVERİŞ */
+
+document.getElementById(
+    "buyHeart"
+)
+.addEventListener("click", function() {
+
+    if(owned.heart) return;
+
+    if(coins < 100) {
+
+        alert("Yeterli coinin yok kk! 🪙");
+
+        return;
+
+    }
+
+    coins -= 100;
+
+    owned.heart = true;
+
+    saveData();
+
+    updateCoins();
+    updateShopButtons();
+
+});
+
+
+document.getElementById(
+    "buyDark"
+)
+.addEventListener("click", function() {
+
+    if(owned.dark) return;
+
+    if(coins < 150) {
+
+        alert("Yeterli coinin yok kk! 🪙");
+
+        return;
+
+    }
+
+    coins -= 150;
+
+    owned.dark = true;
+
+    saveData();
+
+    applyThemes();
+
+    updateCoins();
+    updateShopButtons();
+
+});
+
+
+document.getElementById(
+    "buyGold"
+)
+.addEventListener("click", function() {
+
+    if(owned.gold) return;
+
+    if(coins < 200) {
+
+        alert("Yeterli coinin yok kk! 🪙");
+
+        return;
+
+    }
+
+    coins -= 200;
+
+    owned.gold = true;
+
+    saveData();
+
+    applyThemes();
+
+    updateCoins();
+    updateShopButtons();
+
+});
+
+
+document.getElementById(
+    "buyBoost"
+)
+.addEventListener("click", function() {
+
+    if(owned.boost >= 1) return;
+
+    if(coins < 500) {
+
+        alert("Yeterli coinin yok kk! 🪙");
+
+        return;
+
+    }
+
+    coins -= 500;
+
+    owned.boost = 1;
+
+    saveData();
+
+    updateCoins();
+    updateShopButtons();
+    updateMultiplier();
+
+    alert(
+        "🪙 COIN BOOST ALINDI!"
+    );
+
+});
+
+
+document.getElementById(
+    "buyLifeUpgrade"
+)
+.addEventListener("click", function() {
+
+    if(owned.lifeUpgrade) return;
+
+    if(coins < 350) {
+
+        alert("Yeterli coinin yok kk! 🪙");
+
+        return;
+
+    }
+
+    coins -= 350;
+
+    owned.lifeUpgrade = true;
+
+    saveData();
+
+    updateCoins();
+    updateShopButtons();
+
+    alert(
+        "💖 CAN UPGRADE ALINDI!"
+    );
+
+});
+
+
+/* ==========================================
+   GÖREVLER
+========================================== */
+
+document.getElementById(
+    "missionsButton"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    missionsScreen.style.display =
+        "flex";
+
+    updateMissions();
+
+});
+
+
+document.getElementById(
+    "missionsBack"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    menu.style.display =
+        "flex";
+
+});
+
+
+function updateMissionBar(id, current, max) {
+
+    document.getElementById(id)
+        .style.width =
+        Math.min(
+            100,
+            (current / max) * 100
+        ) + "%";
+
+}
+
+
+function updateMissions() {
+
+    document.getElementById(
+        "mission1Progress"
+    ).textContent =
+        Math.min(
+            missions.completedLevels,
+            5
+        );
+
+    document.getElementById(
+        "mission2Progress"
+    ).textContent =
+        Math.min(
+            missions.noLifeLoss,
+            3
+        );
+
+    document.getElementById(
+        "mission3Progress"
+    ).textContent =
+        Math.min(
+            missions.tenLevels,
+            10
+        );
+
+
+    updateMissionBar(
+        "mission1Bar",
+        missions.completedLevels,
+        5
+    );
+
+    updateMissionBar(
+        "mission2Bar",
+        missions.noLifeLoss,
+        3
+    );
+
+    updateMissionBar(
+        "mission3Bar",
+        missions.tenLevels,
+        10
+    );
+
+
+    document.getElementById(
+        "mission1Button"
+    ).disabled =
+        missions.completedLevels < 5 ||
+        missions.reward1;
+
+    document.getElementById(
+        "mission2Button"
+    ).disabled =
+        missions.noLifeLoss < 3 ||
+        missions.reward2;
+
+    document.getElementById(
+        "mission3Button"
+    ).disabled =
+        missions.tenLevels < 10 ||
+        missions.reward3;
+
+
+    if(missions.reward1) {
+
+        document.getElementById(
+            "mission1Button"
+        ).textContent =
+            "✓ ALINDI";
+
+        document.getElementById(
+            "mission1Box"
+        ).classList.add("completed");
+
+    }
+
+
+    if(missions.reward2) {
+
+        document.getElementById(
+            "mission2Button"
+        ).textContent =
+            "✓ ALINDI";
+
+        document.getElementById(
+            "mission2Box"
+        ).classList.add("completed");
+
+    }
+
+
+    if(missions.reward3) {
+
+        document.getElementById(
+            "mission3Button"
+        ).textContent =
+            "✓ ALINDI";
+
+        document.getElementById(
+            "mission3Box"
+        ).classList.add("completed");
+
+    }
+
+
+    updateCoins();
+
+}
+
+
+/* GÖREV ÖDÜLLERİ */
+
+document.getElementById(
+    "mission1Button"
+)
+.addEventListener("click", function() {
+
+    if(
+        missions.completedLevels >= 5 &&
+        !missions.reward1
+    ) {
+
+        coins += 75;
+
+        missions.reward1 = true;
+
+        saveData();
+
+        updateMissions();
+
+        alert("🎯 Görev tamamlandı! +75 🪙");
+
+    }
+
+});
+
+
+document.getElementById(
+    "mission2Button"
+)
+.addEventListener("click", function() {
+
+    if(
+        missions.noLifeLoss >= 3 &&
+        !missions.reward2
+    ) {
+
+        coins += 125;
+
+        missions.reward2 = true;
+
+        saveData();
+
+        updateMissions();
+
+        alert("❤️ Görev tamamlandı! +125 🪙");
+
+    }
+
+});
+
+
+document.getElementById(
+    "mission3Button"
+)
+.addEventListener("click", function() {
+
+    if(
+        missions.tenLevels >= 10 &&
+        !missions.reward3
+    ) {
+
+        coins += 200;
+
+        missions.reward3 = true;
+
+        saveData();
+
+        updateMissions();
+
+        alert("🔥 Görev tamamlandı! +200 🪙");
+
+    }
+
+});
+
+
+/* ==========================================
+   BAŞARIMLAR
+========================================== */
+
+document.getElementById(
+    "achievementsButton"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    achievementsScreen.style.display =
+        "flex";
+
+    updateAchievements();
+
+});
+
+
+document.getElementById(
+    "achievementsBack"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    menu.style.display =
+        "flex";
+
+});
+
+
+function updateAchievement(id, unlocked) {
+
+    const element =
+        document.getElementById(id);
+
+    if(unlocked) {
+
+        element.classList.add(
+            "completed"
+        );
+
+    } else {
+
+        element.classList.remove(
+            "completed"
+        );
+
+    }
+
+}
+
+
+function updateAchievements() {
+
+    updateAchievement(
+        "achFirst",
+        totalCompleted >= 1
+    );
+
+    updateAchievement(
+        "ach10",
+        totalCompleted >= 10
+    );
+
+    updateAchievement(
+        "ach50",
+        totalCompleted >= 50
+    );
+
+    updateAchievement(
+        "ach100",
+        totalCompleted >= 100
+    );
+
+    updateAchievement(
+        "achRich",
+        coins >= 1000
+    );
+
+}
+
+
+/* ==========================================
+   GÜNLÜK ÖDÜL EKRANI
+========================================== */
+
+document.getElementById(
+    "dailyButton"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    dailyScreen.style.display =
+        "flex";
+
+    updateDaily();
+
+});
+
+
+document.getElementById(
+    "dailyBack"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    menu.style.display =
+        "flex";
+
+});
+
+
+document.getElementById(
+    "dailyClaimButton"
+)
+.addEventListener("click", function() {
+
+    if(dailyClaimed) return;
+
+    const reward =
+        getDailyReward();
+
+
+    coins += reward;
+
+    totalCoinsEarned += reward;
+
+    dailyClaimed = true;
+
+    saveData();
+
+    updateCoins();
+
+    updateDaily();
+
+    alert(
+        "🎁 GÜNLÜK ÖDÜL!\n\n+" +
+        reward +
+        " 🪙"
+    );
+
+});
+
+
+/* ==========================================
+   SEVİYE ÜRETİMİ
+========================================== */
 
 function createGuaranteedLevel() {
 
@@ -593,15 +2313,17 @@ function createGuaranteedLevel() {
     const used = new Set();
 
     let target =
-        5 + Math.floor(level * 0.35);
+        5 +
+        Math.floor(
+            level * 0.35
+        );
 
-    /*
-       Level yükseldikçe ok sayısı artıyor.
-       En fazla 30 ok.
-    */
 
     target =
-        Math.min(target, 30);
+        Math.min(
+            target,
+            30
+        );
 
 
     let attempts = 0;
@@ -630,21 +2352,22 @@ function createGuaranteedLevel() {
             r + "," + c;
 
 
-        if(used.has(key)) {
+        if(used.has(key))
             continue;
-        }
 
 
         const dirs =
-            ["up","down","left","right"];
+            [
+                "up",
+                "down",
+                "left",
+                "right"
+            ];
 
-
-        /*
-           Rastgele yönleri karıştır.
-        */
 
         dirs.sort(
-            () => Math.random() - 0.5
+            () =>
+                Math.random() - 0.5
         );
 
 
@@ -655,6 +2378,7 @@ function createGuaranteedLevel() {
 
             const dir =
                 directions[d];
+
 
             let row =
                 r + dir.dr;
@@ -677,9 +2401,12 @@ function createGuaranteedLevel() {
                     row + "," + col;
 
 
-                if(used.has(blockKey)) {
+                if(
+                    used.has(blockKey)
+                ) {
 
                     clear = false;
+
                     break;
 
                 }
@@ -694,6 +2421,7 @@ function createGuaranteedLevel() {
             if(clear) {
 
                 selected = d;
+
                 break;
 
             }
@@ -701,9 +2429,8 @@ function createGuaranteedLevel() {
         }
 
 
-        if(!selected) {
+        if(!selected)
             continue;
-        }
 
 
         used.add(key);
@@ -720,11 +2447,6 @@ function createGuaranteedLevel() {
     }
 
 
-    /*
-       Çok dolu bir level üretilemediyse
-       tekrar deniyoruz.
-    */
-
     if(result.length < target) {
 
         return createGuaranteedLevel();
@@ -737,10 +2459,6 @@ function createGuaranteedLevel() {
 }
 
 
-/* ==========================================
-   SEVİYE GÜVENLİĞİ
-========================================== */
-
 function getLevelData() {
 
     return createGuaranteedLevel();
@@ -749,335 +2467,43 @@ function getLevelData() {
 
 
 /* ==========================================
-   EKRAN
+   ÖZEL LEVEL
 ========================================== */
 
-document.getElementById("startButton")
-.addEventListener("click", function() {
+function isSpecialLevel() {
 
-    menu.style.display = "none";
-    shop.style.display = "none";
-    game.style.display = "flex";
-
-
-    lives = getMaxLives();
-
-
-    updateLives();
-    updateMultiplier();
-
-    createLevel();
-
-});
-
-
-document.getElementById("howButton")
-.addEventListener("click", function() {
-
-    alert(
-        "🎮 NASIL OYNANIR?\n\n" +
-        "Okların üzerine bas.\n" +
-        "Önü açıksa ok dışarı çıkar.\n" +
-        "Önünde başka ok varsa çıkamaz.\n" +
-        "Yanlış hamlede 1 can kaybedersin.\n\n" +
-        "🪙 Level tamamlayınca coin kazanırsın.\n" +
-        "💰 Coin ödülün çarpanınla artar.\n" +
-        "🏆 Her 100 levelde doğal çarpanın +1 olur.\n\n" +
-        "Levelin otomatik kaydedilir!"
-    );
-
-});
-
-
-/* ==========================================
-   SHOP AÇ
-========================================== */
-
-document.getElementById("shopButton")
-.addEventListener("click", function() {
-
-    menu.style.display = "none";
-    shop.style.display = "flex";
-
-    updateCoins();
-    updateShopButtons();
-
-});
-
-
-document.getElementById("shopBack")
-.addEventListener("click", function() {
-
-    shop.style.display = "none";
-    menu.style.display = "flex";
-
-    updateCoins();
-
-});
-
-
-/* ==========================================
-   SHOP BUTONLARI
-========================================== */
-
-function updateShopButtons() {
-
-    const heart =
-        document.getElementById("buyHeart");
-
-    const dark =
-        document.getElementById("buyDark");
-
-    const gold =
-        document.getElementById("buyGold");
-
-    const boost =
-        document.getElementById("buyBoost");
-
-    const lifeUpgrade =
-        document.getElementById("buyLifeUpgrade");
-
-
-    heart.disabled = owned.heart;
-    dark.disabled = owned.dark;
-    gold.disabled = owned.gold;
-
-    /*
-       Boost bir kere alınabiliyor.
-    */
-
-    boost.disabled =
-        owned.boost >= 1;
-
-    lifeUpgrade.disabled =
-        owned.lifeUpgrade;
-
-
-    if(owned.heart) {
-        heart.textContent = "✓ ALINDI";
-    }
-
-    if(owned.dark) {
-        dark.textContent = "✓ ALINDI";
-    }
-
-    if(owned.gold) {
-        gold.textContent = "✓ ALINDI";
-    }
-
-    if(owned.boost >= 1) {
-        boost.textContent = "✓ ALINDI";
-    }
-
-    if(owned.lifeUpgrade) {
-        lifeUpgrade.textContent = "✓ ALINDI";
-    }
+    return level % 10 === 0;
 
 }
 
 
-/* ==========================================
-   EKSTRA CAN
-========================================== */
+function getSpecialMessage() {
 
-document.getElementById("buyHeart")
-.addEventListener("click", function() {
+    if(level % 50 === 0) {
 
-    if(owned.heart) return;
-
-
-    if(coins < 100) {
-
-        alert("Yeterli coinin yok kk! 🪙");
-
-        return;
+        return "👑 BOSS LEVEL!";
 
     }
 
+    if(level % 30 === 0) {
 
-    coins -= 100;
-
-    owned.heart = true;
-
-    saveData();
-
-    updateCoins();
-    updateShopButtons();
-
-});
-
-
-/* ==========================================
-   KOYU TEMA
-========================================== */
-
-document.getElementById("buyDark")
-.addEventListener("click", function() {
-
-    if(owned.dark) return;
-
-
-    if(coins < 150) {
-
-        alert("Yeterli coinin yok kk! 🪙");
-
-        return;
+        return "⚡ DEV LEVEL!";
 
     }
 
+    if(level % 20 === 0) {
 
-    coins -= 150;
-
-    owned.dark = true;
-
-    saveData();
-
-    applyThemes();
-
-    updateCoins();
-    updateShopButtons();
-
-});
-
-
-/* ==========================================
-   ALTIN OKLAR
-========================================== */
-
-document.getElementById("buyGold")
-.addEventListener("click", function() {
-
-    if(owned.gold) return;
-
-
-    if(coins < 200) {
-
-        alert("Yeterli coinin yok kk! 🪙");
-
-        return;
+        return "🔥 ZOR LEVEL!";
 
     }
 
+    if(level % 10 === 0) {
 
-    coins -= 200;
-
-    owned.gold = true;
-
-    saveData();
-
-    applyThemes();
-
-    updateCoins();
-    updateShopButtons();
-
-});
-
-
-/* ==========================================
-   COIN BOOST
-========================================== */
-
-document.getElementById("buyBoost")
-.addEventListener("click", function() {
-
-    if(owned.boost >= 1) return;
-
-
-    if(coins < 500) {
-
-        alert("Yeterli coinin yok kk! 🪙");
-
-        return;
+        return "🎁 BONUS LEVEL!";
 
     }
 
-
-    coins -= 500;
-
-    owned.boost = 1;
-
-    saveData();
-
-    updateCoins();
-    updateShopButtons();
-    updateMultiplier();
-
-
-    alert(
-        "🪙 COIN BOOST ALINDI!\n\n" +
-        "Para çarpanın artık +" +
-        owned.boost +
-        " arttı!"
-    );
-
-});
-
-
-/* ==========================================
-   CAN UPGRADE
-========================================== */
-
-document.getElementById("buyLifeUpgrade")
-.addEventListener("click", function() {
-
-    if(owned.lifeUpgrade) return;
-
-
-    if(coins < 350) {
-
-        alert("Yeterli coinin yok kk! 🪙");
-
-        return;
-
-    }
-
-
-    coins -= 350;
-
-    owned.lifeUpgrade = true;
-
-    saveData();
-
-    updateCoins();
-    updateShopButtons();
-
-
-    alert(
-        "💖 CAN UPGRADE ALINDI!\n\n" +
-        "Her level başında artık +2 ekstra canın var."
-    );
-
-});
-
-
-/* ==========================================
-   TEMA
-========================================== */
-
-function applyThemes() {
-
-    document.body.classList.toggle(
-        "dark-theme",
-        owned.dark
-    );
-
-    document.body.classList.toggle(
-        "gold-arrows",
-        owned.gold
-    );
-
-}
-
-
-/* ==========================================
-   CAN GÖSTER
-========================================== */
-
-function updateLives() {
-
-    document.getElementById("lives")
-        .textContent =
-        "❤️ ".repeat(lives).trim();
+    return "";
 
 }
 
@@ -1089,13 +2515,17 @@ function updateLives() {
 function createLevel() {
 
     const board =
-        document.getElementById("board");
+        document.getElementById(
+            "board"
+        );
 
     board.innerHTML = "";
 
     arrows = [];
 
     levelWon = false;
+
+    currentLevelLostLife = false;
 
 
     for(
@@ -1105,11 +2535,15 @@ function createLevel() {
     ) {
 
         const cell =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
-        cell.className = "cell";
+        cell.className =
+            "cell";
 
-        cell.dataset.index = i;
+        cell.dataset.index =
+            i;
 
         board.appendChild(cell);
 
@@ -1120,78 +2554,111 @@ function createLevel() {
         getLevelData();
 
 
-    data.forEach(function(item, index) {
+    data.forEach(
+        function(item, index) {
 
-        const cellIndex =
-            item.r * SIZE + item.c;
-
-
-        const cell =
-            board.children[cellIndex];
+            const cellIndex =
+                item.r * SIZE +
+                item.c;
 
 
-        if(!cell) return;
+            const cell =
+                board.children[
+                    cellIndex
+                ];
 
 
-        const arrow =
-            document.createElement("div");
+            if(!cell)
+                return;
 
 
-        arrow.className = "arrow";
+            const arrow =
+                document.createElement(
+                    "div"
+                );
 
 
-        arrow.textContent =
-            directions[item.d].symbol;
+            arrow.className =
+                "arrow";
 
 
-        const object = {
-
-            id: index,
-
-            index: cellIndex,
-
-            direction: item.d,
-
-            element: arrow,
-
-            removed: false
-
-        };
+            arrow.textContent =
+                directions[
+                    item.d
+                ].symbol;
 
 
-        arrows.push(object);
+            const object = {
+
+                id: index,
+
+                index: cellIndex,
+
+                direction: item.d,
+
+                element: arrow,
+
+                removed: false
+
+            };
 
 
-        cell.appendChild(arrow);
+            arrows.push(object);
 
 
-        arrow.addEventListener(
-            "click",
-            function() {
-
-                moveArrow(object);
-
-            }
-        );
-
-    });
+            cell.appendChild(
+                arrow
+            );
 
 
-    document.getElementById("level")
-        .textContent = level;
+            arrow.addEventListener(
+                "click",
+                function() {
+
+                    moveArrow(
+                        object
+                    );
+
+                }
+            );
+
+        }
+    );
 
 
-    document.getElementById("message")
-        .textContent =
-        "Okları dışarı çıkar!";
+    document.getElementById(
+        "level"
+    ).textContent =
+        level;
 
 
-    document.getElementById("next")
-        .style.display = "none";
+    if(isSpecialLevel()) {
+
+        document.getElementById(
+            "message"
+        ).textContent =
+            getSpecialMessage();
+
+    } else {
+
+        document.getElementById(
+            "message"
+        ).textContent =
+            t("playMessage");
+
+    }
 
 
-    document.getElementById("menuButton")
-        .style.display = "block";
+    document.getElementById(
+        "next"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "menuButton"
+    ).style.display =
+        "block";
 
 
     updateMultiplier();
@@ -1222,20 +2689,26 @@ function getCol(index) {
 
 
 /* ==========================================
-   YOL KONTROLÜ
+   YOL
 ========================================== */
 
 function isPathClear(arrow) {
 
     const direction =
-        directions[arrow.direction];
+        directions[
+            arrow.direction
+        ];
 
 
     let row =
-        getRow(arrow.index);
+        getRow(
+            arrow.index
+        );
 
     let col =
-        getCol(arrow.index);
+        getCol(
+            arrow.index
+        );
 
 
     row += direction.dr;
@@ -1254,14 +2727,16 @@ function isPathClear(arrow) {
 
 
         const blocking =
-            arrows.find(function(a) {
+            arrows.find(
+                function(a) {
 
-                return (
-                    !a.removed &&
-                    a.index === index
-                );
+                    return (
+                        !a.removed &&
+                        a.index === index
+                    );
 
-            });
+                }
+            );
 
 
         if(blocking) {
@@ -1288,57 +2763,78 @@ function isPathClear(arrow) {
 
 function moveArrow(arrow) {
 
-    if(arrow.removed) return;
+    if(arrow.removed)
+        return;
 
-    if(levelWon) return;
+    if(levelWon)
+        return;
 
 
     if(!isPathClear(arrow)) {
 
         lives--;
 
+        currentLevelLostLife =
+            true;
+
         updateLives();
 
 
-        document.getElementById("message")
-            .textContent =
-            "Önü kapalı! ❤️ -1";
+        document.getElementById(
+            "message"
+        ).textContent =
+            language === "tr"
+            ? "Önü kapalı! ❤️ -1"
+            : "Blocked! ❤️ -1";
 
 
         arrow.element.style.transform =
             "translateX(-8px)";
 
 
-        setTimeout(function() {
+        setTimeout(
+            function() {
 
-            arrow.element.style.transform =
-                "translateX(8px)";
+                arrow.element.style.transform =
+                    "translateX(8px)";
 
-        }, 70);
+            },
+            70
+        );
 
 
-        setTimeout(function() {
+        setTimeout(
+            function() {
 
-            arrow.element.style.transform =
-                "translateX(0)";
+                arrow.element.style.transform =
+                    "translateX(0)";
 
-        }, 140);
+            },
+            140
+        );
 
 
         if(lives <= 0) {
 
-            document.getElementById("message")
-                .textContent =
-                "OYUN BİTTİ!";
+            document.getElementById(
+                "message"
+            ).textContent =
+                language === "tr"
+                ? "OYUN BİTTİ!"
+                : "GAME OVER!";
 
 
-            setTimeout(function() {
+            setTimeout(
+                function() {
 
-                lives = getMaxLives();
+                    lives =
+                        getMaxLives();
 
-                createLevel();
+                    createLevel();
 
-            }, 1000);
+                },
+                1000
+            );
 
         }
 
@@ -1352,7 +2848,9 @@ function moveArrow(arrow) {
 
 
     const direction =
-        directions[arrow.direction];
+        directions[
+            arrow.direction
+        ];
 
 
     let x = 0;
@@ -1376,18 +2874,26 @@ function moveArrow(arrow) {
         `translate(${x}px, ${y}px) scale(1.4)`;
 
 
-    arrow.element.style.opacity = "0";
+    arrow.element.style.opacity =
+        "0";
 
 
-    setTimeout(function() {
+    setTimeout(
+        function() {
 
-        if(arrow.element.parentNode) {
-            arrow.element.remove();
-        }
+            if(
+                arrow.element.parentNode
+            ) {
 
-        checkWin();
+                arrow.element.remove();
 
-    }, 350);
+            }
+
+            checkWin();
+
+        },
+        350
+    );
 
 }
 
@@ -1399,11 +2905,13 @@ function moveArrow(arrow) {
 function checkWin() {
 
     const remaining =
-        arrows.filter(function(a) {
+        arrows.filter(
+            function(a) {
 
-            return !a.removed;
+                return !a.removed;
 
-        });
+            }
+        );
 
 
     if(
@@ -1414,27 +2922,68 @@ function checkWin() {
         levelWon = true;
 
 
-        const reward =
-            25 * getMultiplier();
+        let reward =
+            25 *
+            getMultiplier();
+
+
+        /* Özel level bonusu */
+
+        if(isSpecialLevel()) {
+
+            reward += 50;
+
+        }
 
 
         coins += reward;
+
+        totalCoinsEarned += reward;
+
+        totalCompleted++;
+
+
+        /*
+           GÖREVLER
+        */
+
+        missions.completedLevels++;
+
+        missions.tenLevels++;
+
+
+        if(!currentLevelLostLife) {
+
+            missions.noLifeLoss++;
+
+        }
 
 
         saveData();
 
         updateCoins();
 
+        updateAchievements();
 
-        document.getElementById("message")
-            .textContent =
-            "🎉 LEVEL TAMAMLANDI! +" +
-            reward +
-            " 🪙";
+        updateMissions();
 
 
-        document.getElementById("next")
-            .style.display = "block";
+        document.getElementById(
+            "message"
+        ).textContent =
+            language === "tr"
+            ? "🎉 LEVEL TAMAMLANDI! +" +
+              reward +
+              " 🪙"
+            : "🎉 LEVEL COMPLETE! +" +
+              reward +
+              " 🪙";
+
+
+        document.getElementById(
+            "next"
+        ).style.display =
+            "block";
 
     }
 
@@ -1445,26 +2994,27 @@ function checkWin() {
    SONRAKİ LEVEL
 ========================================== */
 
-document.getElementById("next")
+document.getElementById(
+    "next"
+)
 .addEventListener("click", function() {
 
-    if(!levelWon) return;
+    if(!levelWon)
+        return;
 
 
     level++;
 
 
-    lives = getMaxLives();
+    lives =
+        getMaxLives();
 
-
-    /*
-       Level hemen kaydediliyor.
-    */
 
     saveData();
 
 
     updateLives();
+
     updateMultiplier();
 
     createLevel();
@@ -1476,34 +3026,74 @@ document.getElementById("next")
    MENÜYE DÖN
 ========================================== */
 
-document.getElementById("menuButton")
+document.getElementById(
+    "menuButton"
+)
 .addEventListener("click", function() {
-
-    /*
-       Bulunduğun level kaybolmaz.
-    */
 
     saveData();
 
 
-    game.style.display = "none";
+    game.style.display =
+        "none";
 
-    menu.style.display = "flex";
+    menu.style.display =
+        "flex";
 
     updateCoins();
 
+    updatePlayerName();
+
 });
+
+
+/* ==========================================
+   TEMA
+========================================== */
+
+function applyThemes() {
+
+    document.body.classList.toggle(
+        "dark-theme",
+        owned.dark
+    );
+
+    document.body.classList.toggle(
+        "gold-arrows",
+        owned.gold
+    );
+
+}
 
 
 /* ==========================================
    BAŞLANGIÇ
 ========================================== */
 
+checkDailyLogin();
+
 updateCoins();
+
+updatePlayerName();
 
 applyThemes();
 
 updateMultiplier();
+
+updateDaily();
+
+applyLanguage();
+
+
+/*
+   İlk kez giriyorsa isim sor.
+*/
+
+if(!playerName) {
+
+    showNameScreen();
+
+}
 
 </script>
 
