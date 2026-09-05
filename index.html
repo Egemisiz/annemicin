@@ -34,7 +34,9 @@ button {
 #missions,
 #settings,
 #achievements,
-#daily {
+#daily,
+#codes,
+#adminCodes {
     justify-content: center;
     text-align: center;
 }
@@ -377,6 +379,73 @@ button {
     text-shadow: 0 0 8px #d4af37;
 }
 
+
+.code-box {
+    width: min(85vw, 350px);
+    padding: 14px;
+    font-size: 18px;
+    border: 3px solid #111;
+    border-radius: 10px;
+    text-align: center;
+    outline: none;
+    margin: 10px 0;
+    text-transform: uppercase;
+}
+
+.code-list {
+    width: 100%;
+}
+
+.code-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid #111;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 7px 0;
+}
+
+.code-row span {
+    font-weight: bold;
+}
+
+.code-row button {
+    border: 2px solid #111;
+    border-radius: 8px;
+    background: #111;
+    color: white;
+    padding: 7px 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.code-status {
+    min-height: 24px;
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.small-note {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.dark-theme .code-row {
+    border-color: white;
+}
+
+.dark-theme .code-row button {
+    background: white;
+    color: #111;
+}
+
+.dark-theme .small-note {
+    color: #bbb;
+}
+
 @media (max-width: 500px) {
     .menu-title {
         font-size: 50px;
@@ -465,6 +534,10 @@ button {
 
     <button class="menu-button secondary" id="dailyButton">
         🎁 GÜNLÜK ÖDÜL
+    </button>
+
+    <button class="menu-button secondary" id="codesButton">
+        🎟️ KOD GİR
     </button>
 
     <button class="menu-button secondary" id="settingsButton">
@@ -676,6 +749,117 @@ button {
 
 
 <!-- =========================
+     KOD GİR
+========================= -->
+
+<div id="codes" class="screen" style="display:none;">
+
+    <div class="shop-title">🎟️ KOD GİR</div>
+
+    <div class="panel">
+
+        <div class="panel-item">
+
+            <h3>🎁 ÖDÜL KODU</h3>
+
+            <p>
+                Sana verilen kodu buraya yaz.
+            </p>
+
+            <input
+                id="codeInput"
+                class="code-box"
+                maxlength="32"
+                placeholder="Örn: EGE100"
+                autocomplete="off"
+            >
+
+            <button
+                class="setting-button"
+                id="redeemCodeButton"
+            >
+                🎁 KODU KULLAN
+            </button>
+
+            <div
+                id="codeStatus"
+                class="code-status"
+            ></div>
+
+        </div>
+
+    </div>
+
+    <button class="back-button" id="codesBack">
+        ← MENÜ
+    </button>
+
+</div>
+
+
+<!-- =========================
+     ADMIN CODE PANEL
+========================= -->
+
+<div id="adminCodes" class="screen" style="display:none;">
+
+    <div class="shop-title">🔐 CODE PANEL</div>
+
+    <div class="panel">
+
+        <div class="panel-item">
+
+            <h3>➕ YENİ KOD</h3>
+
+            <input
+                id="newCodeInput"
+                class="code-box"
+                maxlength="32"
+                placeholder="Kod"
+                autocomplete="off"
+            >
+
+            <input
+                id="newCodeReward"
+                class="code-box"
+                type="number"
+                min="1"
+                max="1000000"
+                placeholder="Coin ödülü"
+            >
+
+            <button
+                class="setting-button"
+                id="addCodeButton"
+            >
+                ➕ KOD OLUŞTUR
+            </button>
+
+            <p class="small-note">
+                Bu panel bu sürümde cihazdaki kod listesini yönetir. Şifre: EGEADMIN
+                Gerçekten tüm oyunculara ortak kod dağıtmak için online veritabanı gerekir.
+            </p>
+
+        </div>
+
+        <div class="panel-item">
+
+            <h3>📋 KODLAR</h3>
+
+            <div id="adminCodeList" class="code-list"></div>
+
+        </div>
+
+    </div>
+
+    <button class="back-button" id="adminCodesBack">
+        ← MENÜ
+    </button>
+
+</div>
+
+
+<!-- =========================
      AYARLAR
 ========================= -->
 
@@ -706,6 +890,34 @@ button {
             >
                 ✏️ İSMİ DEĞİŞTİR
             </button>
+
+        </div>
+
+        <div class="panel-item">
+
+            <h3>🔐 CODE PANEL</h3>
+
+            <p class="small-note">
+                Kodlarını yönetmek için yönetici panelini aç.
+            </p>
+
+            <button
+                class="setting-button"
+                id="openAdminCodesButton"
+            >
+                🔐 PANELİ AÇ
+            </button>
+
+            <div id="adminLoginBox" style="display:none; margin-top:10px;">
+                <input id="adminPasswordInput" class="code-box"
+                       type="password" maxlength="32"
+                       placeholder="Admin şifresi" autocomplete="off">
+                <br>
+                <button class="setting-button" id="adminLoginButton">
+                    🔓 GİRİŞ YAP
+                </button>
+                <div id="adminLoginStatus" class="code-status"></div>
+            </div>
 
         </div>
 
@@ -835,6 +1047,394 @@ let owned = {
 };
 
 
+
+/* ==========================================
+   KOD SİSTEMİ
+========================================== */
+
+function getAllCodes() {
+
+    return {
+        ...DEFAULT_CODES,
+        ...customCodes
+    };
+
+}
+
+
+function normalizeCode(value) {
+
+    return value
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "");
+
+}
+
+
+function renderAdminCodes() {
+
+    const list =
+        document.getElementById("adminCodeList");
+
+    if(!list)
+        return;
+
+    list.innerHTML = "";
+
+    const allCodes = getAllCodes();
+
+    const entries =
+        Object.entries(allCodes);
+
+    if(entries.length === 0) {
+
+        list.innerHTML =
+            "<p>Henüz kod yok.</p>";
+
+        return;
+
+    }
+
+    entries.forEach(function([code, reward]) {
+
+        const row =
+            document.createElement("div");
+
+        row.className = "code-row";
+
+        const info =
+            document.createElement("span");
+
+        info.textContent =
+            code + " → 🪙 " + reward;
+
+        row.appendChild(info);
+
+        if(!Object.prototype.hasOwnProperty.call(DEFAULT_CODES, code)) {
+
+            const remove =
+                document.createElement("button");
+
+            remove.textContent = "SİL";
+
+            remove.addEventListener("click", function() {
+
+                delete customCodes[code];
+
+                saveData();
+
+                renderAdminCodes();
+
+            });
+
+            row.appendChild(remove);
+
+        } else {
+
+            const tag =
+                document.createElement("small");
+
+            tag.textContent = "SABİT";
+
+            row.appendChild(tag);
+
+        }
+
+        list.appendChild(row);
+
+    });
+
+}
+
+
+function openCodesScreen() {
+
+    hideAllScreens();
+
+    codesScreen.style.display =
+        "flex";
+
+    const input =
+        document.getElementById("codeInput");
+
+    const status =
+        document.getElementById("codeStatus");
+
+    input.value = "";
+    status.textContent = "";
+
+}
+
+
+function redeemCode() {
+
+    const input =
+        document.getElementById("codeInput");
+
+    const status =
+        document.getElementById("codeStatus");
+
+    const code =
+        normalizeCode(input.value);
+
+    if(!code) {
+
+        status.textContent =
+            "Bir kod yaz kk!";
+
+        return;
+
+    }
+
+    const allCodes =
+        getAllCodes();
+
+    if(!Object.prototype.hasOwnProperty.call(allCodes, code)) {
+
+        status.textContent =
+            "❌ Bu kod geçersiz.";
+
+        return;
+
+    }
+
+    if(usedCodes.includes(code)) {
+
+        status.textContent =
+            "⚠️ Bu kodu daha önce kullandın.";
+
+        return;
+
+    }
+
+    const reward =
+        Number(allCodes[code]);
+
+    if(!Number.isFinite(reward) || reward <= 0) {
+
+        status.textContent =
+            "❌ Kod ödülü geçersiz.";
+
+        return;
+
+    }
+
+    coins += reward;
+
+    totalCoinsEarned += reward;
+
+    usedCodes.push(code);
+
+    saveData();
+
+    updateCoins();
+
+    updateAchievements();
+
+    input.value = "";
+
+    status.textContent =
+        "🎉 Kod kullanıldı! +" +
+        reward +
+        " 🪙";
+
+}
+
+
+document.getElementById(
+    "codesButton"
+)
+.addEventListener("click", openCodesScreen);
+
+
+document.getElementById(
+    "codesBack"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    menu.style.display =
+        "flex";
+
+    updateCoins();
+
+});
+
+
+document.getElementById(
+    "redeemCodeButton"
+)
+.addEventListener("click", redeemCode);
+
+
+document.getElementById(
+    "codeInput"
+)
+.addEventListener("keydown", function(event) {
+
+    if(event.key === "Enter") {
+
+        redeemCode();
+
+    }
+
+});
+
+
+/* ==========================================
+   ADMIN PANEL
+========================================== */
+
+/*
+   Bu parola güvenlik sağlamaz; HTML içindeki
+   JavaScript herkes tarafından görülebilir.
+   Gerçek güvenli admin için online auth gerekir.
+*/
+const LOCAL_ADMIN_PASSWORD = "EGEADMIN";
+
+
+const openAdminCodesButton =
+    document.getElementById("openAdminCodesButton");
+
+const adminLoginBox =
+    document.getElementById("adminLoginBox");
+
+const adminPasswordInput =
+    document.getElementById("adminPasswordInput");
+
+const adminLoginButton =
+    document.getElementById("adminLoginButton");
+
+const adminLoginStatus =
+    document.getElementById("adminLoginStatus");
+
+openAdminCodesButton.addEventListener("click", function() {
+
+    adminLoginBox.style.display = "block";
+    adminLoginStatus.textContent = "";
+    adminPasswordInput.value = "";
+    adminPasswordInput.focus();
+
+});
+
+function tryAdminLogin() {
+
+    const password =
+        adminPasswordInput.value.trim();
+
+    if(password !== LOCAL_ADMIN_PASSWORD) {
+
+        adminLoginStatus.textContent =
+            "❌ Şifre yanlış.";
+
+        return;
+    }
+
+    adminLoginBox.style.display = "none";
+    adminPasswordInput.value = "";
+
+    hideAllScreens();
+
+    adminCodesScreen.style.display = "flex";
+
+    renderAdminCodes();
+
+}
+
+adminLoginButton.addEventListener(
+    "click",
+    tryAdminLogin
+);
+
+adminPasswordInput.addEventListener(
+    "keydown",
+    function(event) {
+
+        if(event.key === "Enter") {
+            tryAdminLogin();
+        }
+
+    }
+);
+
+
+document.getElementById(
+    "adminCodesBack"
+)
+.addEventListener("click", function() {
+
+    hideAllScreens();
+
+    menu.style.display =
+        "flex";
+
+});
+
+
+document.getElementById(
+    "addCodeButton"
+)
+.addEventListener("click", function() {
+
+    const codeInput =
+        document.getElementById("newCodeInput");
+
+    const rewardInput =
+        document.getElementById("newCodeReward");
+
+    const code =
+        normalizeCode(codeInput.value);
+
+    const reward =
+        Number(rewardInput.value);
+
+    if(code.length < 2) {
+
+        alert("En az 2 karakterlik bir kod yaz.");
+
+        return;
+
+    }
+
+    if(!Number.isInteger(reward) || reward <= 0) {
+
+        alert("Geçerli bir coin ödülü yaz.");
+
+        return;
+
+    }
+
+    if(Object.prototype.hasOwnProperty.call(DEFAULT_CODES, code)) {
+
+        alert("Bu kod sabit kodlardan biri.");
+
+        return;
+
+    }
+
+    customCodes[code] =
+        reward;
+
+    saveData();
+
+    codeInput.value = "";
+    rewardInput.value = "";
+
+    renderAdminCodes();
+
+    alert(
+        "✅ Kod oluşturuldu!\n\n" +
+        code +
+        " → +" +
+        reward +
+        " 🪙"
+    );
+
+});
+
+
 /* ==========================================
    GÖREVLER
 ========================================== */
@@ -888,6 +1488,45 @@ let dailyClaimed =
 
 
 /* ==========================================
+   KOD SİSTEMİ
+========================================== */
+
+/*
+   NOT:
+   Bu GitHub Pages sürümünde kodlar cihazda tutulur.
+   Global/online kod sistemi için backend gerekir.
+*/
+
+const DEFAULT_CODES = {
+    "EGE100": 100,
+    "WELCOME": 250,
+    "UPDATE1": 500
+};
+
+let customCodes = {};
+
+try {
+    customCodes =
+        JSON.parse(
+            localStorage.getItem("egeCustomCodes") || "{}"
+        );
+} catch(e) {
+    customCodes = {};
+}
+
+let usedCodes = [];
+
+try {
+    usedCodes =
+        JSON.parse(
+            localStorage.getItem("egeUsedCodes") || "[]"
+        );
+} catch(e) {
+    usedCodes = [];
+}
+
+
+/* ==========================================
    DİL
 ========================================== */
 
@@ -900,6 +1539,7 @@ const translations = {
         missions: "🎯 GÖREVLER",
         achievements: "🏆 BAŞARIMLAR",
         daily: "🎁 GÜNLÜK ÖDÜL",
+        codes: "🎟️ KOD GİR",
         settings: "⚙️ AYARLAR",
         how: "? NASIL OYNANIR",
         menu: "← MENÜ",
@@ -917,6 +1557,7 @@ const translations = {
         missions: "🎯 MISSIONS",
         achievements: "🏆 ACHIEVEMENTS",
         daily: "🎁 DAILY REWARD",
+        codes: "🎟️ REDEEM CODE",
         settings: "⚙️ SETTINGS",
         how: "? HOW TO PLAY",
         menu: "← MENU",
@@ -1042,6 +1683,16 @@ function saveData() {
     localStorage.setItem(
         "egeDailyClaimed",
         dailyClaimed
+    );
+
+    localStorage.setItem(
+        "egeCustomCodes",
+        JSON.stringify(customCodes)
+    );
+
+    localStorage.setItem(
+        "egeUsedCodes",
+        JSON.stringify(usedCodes)
     );
 
 }
@@ -1197,6 +1848,12 @@ function updateDaily() {
 
 function updateCoins() {
 
+    const streakElement =
+        document.getElementById("streakText");
+
+    if(streakElement)
+        streakElement.textContent = streak;
+
     document.getElementById(
         "menuCoins"
     ).textContent = coins;
@@ -1333,6 +1990,12 @@ const achievementsScreen =
 const dailyScreen =
     document.getElementById("daily");
 
+const codesScreen =
+    document.getElementById("codes");
+
+const adminCodesScreen =
+    document.getElementById("adminCodes");
+
 
 function hideAllScreens() {
 
@@ -1342,6 +2005,8 @@ function hideAllScreens() {
     settingsScreen.style.display = "none";
     achievementsScreen.style.display = "none";
     dailyScreen.style.display = "none";
+    codesScreen.style.display = "none";
+    adminCodesScreen.style.display = "none";
     game.style.display = "none";
 
 }
@@ -1557,6 +2222,10 @@ function applyLanguage() {
     document.getElementById(
         "dailyButton"
     ).textContent = t("daily");
+
+    document.getElementById(
+        "codesButton"
+    ).textContent = t("codes");
 
     document.getElementById(
         "settingsButton"
@@ -2306,36 +2975,259 @@ document.getElementById(
    SEVİYE ÜRETİMİ
 ========================================== */
 
+function getTargetArrowCount() {
+
+    if(level <= 5)
+        return 8 + Math.floor(level / 2);
+
+    if(level <= 10)
+        return 11 + Math.floor(level / 3);
+
+    if(level <= 20)
+        return 14 + Math.floor(level / 3);
+
+    if(level <= 50)
+        return 18 + Math.floor(level / 8);
+
+    if(level <= 100)
+        return 24 + Math.floor(level / 20);
+
+    return 29;
+
+}
+
+
+function countBlockingRelations(candidate, result) {
+
+    let score = 0;
+
+    result.forEach(function(existing) {
+
+        const dir =
+            directions[existing.d];
+
+        let row =
+            existing.r + dir.dr;
+
+        let col =
+            existing.c + dir.dc;
+
+        while(
+            row >= 0 &&
+            row < SIZE &&
+            col >= 0 &&
+            col < SIZE
+        ) {
+
+            if(
+                row === candidate.r &&
+                col === candidate.c
+            ) {
+
+                score++;
+                break;
+
+            }
+
+            row += dir.dr;
+            col += dir.dc;
+
+        }
+
+    });
+
+    return score;
+
+}
+
+
+function candidatePathClear(candidate, used) {
+
+    const dir =
+        directions[candidate.d];
+
+    let row =
+        candidate.r + dir.dr;
+
+    let col =
+        candidate.c + dir.dc;
+
+    while(
+        row >= 0 &&
+        row < SIZE &&
+        col >= 0 &&
+        col < SIZE
+    ) {
+
+        if(
+            used.has(
+                row + "," + col
+            )
+        ) {
+
+            return false;
+
+        }
+
+        row += dir.dr;
+        col += dir.dc;
+
+    }
+
+    return true;
+
+}
+
+
 function createGuaranteedLevel() {
+
+    const target =
+        Math.min(
+            getTargetArrowCount(),
+            30
+        );
+
+    for(let generation = 0; generation < 250; generation++) {
+
+        const result = [];
+
+        const used =
+            new Set();
+
+        while(result.length < target) {
+
+            const candidates = [];
+
+            for(let r = 0; r < SIZE; r++) {
+
+                for(let c = 0; c < SIZE; c++) {
+
+                    const key =
+                        r + "," + c;
+
+                    if(used.has(key))
+                        continue;
+
+                    const dirs =
+                        [
+                            "up",
+                            "down",
+                            "left",
+                            "right"
+                        ];
+
+                    dirs.forEach(function(d) {
+
+                        const candidate = {
+                            r: r,
+                            c: c,
+                            d: d
+                        };
+
+                        if(
+                            !candidatePathClear(
+                                candidate,
+                                used
+                            )
+                        ) {
+
+                            return;
+
+                        }
+
+                        const blocking =
+                            countBlockingRelations(
+                                candidate,
+                                result
+                            );
+
+                        /*
+                           Daha fazla mevcut oku bloke eden
+                           adayları öne çıkarıyoruz. Böylece
+                           çözüm zincirleri oluşuyor.
+                        */
+                        candidates.push({
+                            candidate: candidate,
+                            blocking: blocking,
+                            random: Math.random()
+                        });
+
+                    });
+
+                }
+
+            }
+
+            if(candidates.length === 0)
+                break;
+
+            candidates.sort(function(a, b) {
+
+                if(b.blocking !== a.blocking)
+                    return b.blocking - a.blocking;
+
+                return b.random - a.random;
+
+            });
+
+            /*
+               Her zaman aynı adayı seçmemek için
+               en iyi adayların arasından seçim.
+            */
+            const poolSize =
+                Math.min(
+                    candidates.length,
+                    Math.max(
+                        8,
+                        Math.floor(candidates.length * 0.08)
+                    )
+                );
+
+            const chosen =
+                candidates[
+                    Math.floor(
+                        Math.random() * poolSize
+                    )
+                ].candidate;
+
+            used.add(
+                chosen.r + "," + chosen.c
+            );
+
+            result.push(chosen);
+
+        }
+
+        if(result.length === target) {
+
+            return result;
+
+        }
+
+    }
+
+    /*
+       Çok nadir bir durumda güvenli bir fallback.
+    */
+    return createSimpleGuaranteedLevel(target);
+
+}
+
+
+function createSimpleGuaranteedLevel(target) {
 
     const result = [];
 
     const used = new Set();
 
-    let target =
-        5 +
-        Math.floor(
-            level * 0.35
-        );
-
-
-    target =
-        Math.min(
-            target,
-            30
-        );
-
-
     let attempts = 0;
-
 
     while(
         result.length < target &&
-        attempts < 5000
+        attempts < 10000
     ) {
 
         attempts++;
-
 
         const r =
             Math.floor(
@@ -2347,14 +3239,11 @@ function createGuaranteedLevel() {
                 Math.random() * SIZE
             );
 
-
         const key =
             r + "," + c;
 
-
         if(used.has(key))
             continue;
-
 
         const dirs =
             [
@@ -2364,63 +3253,29 @@ function createGuaranteedLevel() {
                 "right"
             ];
 
-
         dirs.sort(
             () =>
                 Math.random() - 0.5
         );
 
-
-        let selected = null;
-
-
         for(const d of dirs) {
 
-            const dir =
-                directions[d];
+            const candidate = {
+                r: r,
+                c: c,
+                d: d
+            };
 
-
-            let row =
-                r + dir.dr;
-
-            let col =
-                c + dir.dc;
-
-
-            let clear = true;
-
-
-            while(
-                row >= 0 &&
-                row < SIZE &&
-                col >= 0 &&
-                col < SIZE
+            if(
+                candidatePathClear(
+                    candidate,
+                    used
+                )
             ) {
 
-                const blockKey =
-                    row + "," + col;
+                used.add(key);
 
-
-                if(
-                    used.has(blockKey)
-                ) {
-
-                    clear = false;
-
-                    break;
-
-                }
-
-
-                row += dir.dr;
-                col += dir.dc;
-
-            }
-
-
-            if(clear) {
-
-                selected = d;
+                result.push(candidate);
 
                 break;
 
@@ -2428,36 +3283,11 @@ function createGuaranteedLevel() {
 
         }
 
-
-        if(!selected)
-            continue;
-
-
-        used.add(key);
-
-
-        result.push({
-
-            r: r,
-            c: c,
-            d: selected
-
-        });
-
     }
-
-
-    if(result.length < target) {
-
-        return createGuaranteedLevel();
-
-    }
-
 
     return result;
 
 }
-
 
 function getLevelData() {
 
